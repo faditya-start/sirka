@@ -20,7 +20,7 @@ export const registerUser = async (req, res) => {
       status: "success",
       message: "Registrasi berhasil",
       data: {
-        _id: user.id,
+        _id: user._id,
         name: user.name,
         email: user.email,
         token: generateToken(user._id),
@@ -41,7 +41,7 @@ export const loginUser = async (req, res) => {
         status: "success",
         message: "Login berhasil",
         data: {
-          _id: user.id,
+          _id: user._id,
           name: user.name,
           email: user.email,
           token: generateToken(user._id),
