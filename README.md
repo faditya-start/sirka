@@ -17,11 +17,9 @@ Project ini dibangun menggunakan teknologi berikut:
 
 ---
 
-## Petunjuk Instalasi & Setup
+instalasi dan setup
 
 Ikuti langkah-langkah berikut untuk menjalankan server di komputer lokal Anda setelah melakukan cloning.
-
-### 1. Kloning Repositori
 
 ```bash
 git clone [https://github.com/faditya-start/sirka.git](https://github.com/faditya-start/sirka.git)
