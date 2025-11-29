@@ -17,7 +17,7 @@ Project ini dibangun menggunakan teknologi berikut:
 
 ---
 
-instalasi dan setup
+## instalasi dan setup
 
 Ikuti langkah-langkah berikut untuk menjalankan server di komputer lokal Anda setelah melakukan cloning.
 
@@ -41,6 +41,7 @@ npm start
 
 # Atau jika menggunakan nodemon untuk development
 npm run dev
+```
 
 ## API Endpoints
 
