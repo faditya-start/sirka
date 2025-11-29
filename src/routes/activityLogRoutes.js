@@ -1,19 +1,19 @@
 import express from "express";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import {
-  createFoodLog,
-  getAllFoodLogs,
-  getFoodLogsByUser,
-  updateFoodLog,
-  deleteFoodLog,
-} from "../controllers/foodLogController.js";
+  createActivityLog,
+  getAllActivities,
+  getActivitiesByUser,
+  updateActivityLog,
+  deleteActivityLog,
+} from "../controllers/activityLogController.js";
 
 const router = express.Router();
 
-router.post("/", authMiddleware, createFoodLog);
-router.get("/", authMiddleware, getAllFoodLogs);
-router.get("/user/:userId", authMiddleware, getFoodLogsByUser);
-router.put("/:id", authMiddleware, updateFoodLog);
-router.delete("/:id", authMiddleware, deleteFoodLog);
+router.post("/", authMiddleware, createActivityLog);
+router.get("/", authMiddleware, getAllActivities);
+router.get("/user/:userId", authMiddleware, getActivitiesByUser);
+router.put("/:id", authMiddleware, updateActivityLog);
+router.delete("/:id", authMiddleware, deleteActivityLog);
 
 export default router;
