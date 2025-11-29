@@ -4,7 +4,7 @@ import cors from "cors";
 import connectDB from "./config/db.js";
 import userRoutes from "./routes/userRoutes.js";
 import foodLogRoutes from "./routes/foodLogRoutes.js";
-import activityLogRoutes from "./routes/ActivyLogRoutes.js";  
+import activityLogRoutes from "./routes/activityLogRoutes.js";  
 import programRoutes from "./routes/programRoutes.js";
 import weightProgressRoutes from "./routes/weightProgressRoutes.js";
 import historyRoutes from "./routes/historyRoutes.js";
