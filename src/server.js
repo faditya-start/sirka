@@ -6,6 +6,7 @@ import userRoutes from "./routes/userRoutes.js";
 import foodLogRoutes from "./routes/foodLogRoutes.js";
 import activityLogRoutes from "./routes/ActivyLogRoutes.js";  
 import programRoutes from "./routes/programRoutes.js";
+import weightProgressRoutes from "./routes/weightProgressRoutes.js";
 
 dotenv.config();
 connectDB();
@@ -19,6 +20,7 @@ app.use("/api/users", userRoutes);
 app.use("/api/foodlogs", foodLogRoutes);
 app.use("/api/activitylogs", activityLogRoutes);
 app.use("/api/programs", programRoutes);
+app.use("/api/weightprogress", weightProgressRoutes);
 
 app.get("/", (req, res) => {
   res.send("Sirka Backend is running");
