@@ -5,6 +5,7 @@ import connectDB from "./config/db.js";
 import userRoutes from "./routes/userRoutes.js";
 import foodLogRoutes from "./routes/foodLogRoutes.js";
 import activityLogRoutes from "./routes/ActivyLogRoutes.js";  
+import programRoutes from "./routes/programRoutes.js";
 
 dotenv.config();
 connectDB();
@@ -17,6 +18,7 @@ app.use(express.json());
 app.use("/api/users", userRoutes);
 app.use("/api/foodlogs", foodLogRoutes);
 app.use("/api/activitylogs", activityLogRoutes);
+app.use("/api/programs", programRoutes);
 
 app.get("/", (req, res) => {
   res.send("Sirka Backend is running");
