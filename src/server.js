@@ -25,7 +25,7 @@ app.use("/api/weightprogress", weightProgressRoutes);
 app.use("/api/history", historyRoutes);
 
 app.get("/", (req, res) => {
-  res.send("Sirka Backend is running");
+  res.send("Sirka Backend server is running");
 });
 
 const PORT = process.env.PORT || 5000;
