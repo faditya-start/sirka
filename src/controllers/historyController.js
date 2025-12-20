@@ -1,11 +1,13 @@
 import FoodLog from "../models/FoodLog.js";
 import ActivityLog from "../models/ActivityLog.js";
 import WeightProgress from "../models/WeightProgress.js";
+import WaterLog from "../models/WaterLog.js";
+
 
 // Get daily summary for user
 export const getDailySummary = async (req, res) => {
   try {
-    const userId = req.user.id; 
+    const userId = req.user.id;
 
     const { date } = req.query;
     const targetDate = new Date(date);
@@ -27,9 +29,16 @@ export const getDailySummary = async (req, res) => {
     // Get latest weight log
     const latestWeight = await WeightProgress.findOne({ user: userId }).sort({ date: -1 });
 
+    // Get water logs for the day
+    const waterLogs = await WaterLog.find({
+      user: userId,
+      date: { $gte: startOfDay, $lte: endOfDay },
+    });
+
     // Calculate totals
     const totalCaloriesIn = foodLogs.reduce((sum, log) => sum + log.calories, 0);
     const totalCaloriesOut = activityLogs.reduce((sum, log) => sum + log.caloriesBurned, 0);
+    const totalWater = waterLogs.reduce((sum, log) => sum + log.amount, 0);
     const netCalories = totalCaloriesIn - totalCaloriesOut;
 
     res.json({
@@ -38,11 +47,13 @@ export const getDailySummary = async (req, res) => {
         totalCaloriesIn,
         totalCaloriesOut,
         netCalories,
+        totalWater,
         latestWeight: latestWeight ? latestWeight.weight : null,
       },
       details: {
         foods: foodLogs,
         activities: activityLogs,
+        water: waterLogs,
       },
     });
   } catch (error) {
@@ -73,8 +84,14 @@ export const getWeeklyTrend = async (req, res) => {
       date: { $gte: sevenDaysAgo },
     });
 
+    const waterLogs = await WaterLog.find({
+      user: userId,
+      date: { $gte: sevenDaysAgo },
+    });
+
     const totalCaloriesIn = foodLogs.reduce((sum, log) => sum + log.calories, 0);
     const totalCaloriesOut = activityLogs.reduce((sum, log) => sum + log.caloriesBurned, 0);
+    const totalWater = waterLogs.reduce((sum, log) => sum + log.amount, 0);
 
     res.json({
       status: "success",
@@ -82,6 +99,7 @@ export const getWeeklyTrend = async (req, res) => {
         totalCaloriesIn,
         totalCaloriesOut,
         netCalories: totalCaloriesIn - totalCaloriesOut,
+        totalWater,
         startWeight: weightLogs[weightLogs.length - 1]?.weight || null,
         endWeight: weightLogs[0]?.weight || null,
       },
@@ -89,6 +107,7 @@ export const getWeeklyTrend = async (req, res) => {
         foodLogs,
         activityLogs,
         weightLogs,
+        waterLogs,
       },
     });
   } catch (error) {
