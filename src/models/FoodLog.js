@@ -24,6 +24,18 @@ const foodLogSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    protein: {
+      type: Number,
+      default: 0,
+    },
+    carbs: {
+      type: Number,
+      default: 0,
+    },
+    fat: {
+      type: Number,
+      default: 0,
+    },
     portion: {
       type: String,
       default: "1 porsi",
@@ -34,4 +46,3 @@ const foodLogSchema = new mongoose.Schema(
 
 const FoodLog = mongoose.model("FoodLog", foodLogSchema);
 export default FoodLog;
-    

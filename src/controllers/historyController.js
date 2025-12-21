@@ -37,6 +37,9 @@ export const getDailySummary = async (req, res) => {
 
     // Calculate totals
     const totalCaloriesIn = foodLogs.reduce((sum, log) => sum + log.calories, 0);
+    const totalProtein = foodLogs.reduce((sum, log) => sum + (log.protein || 0), 0);
+    const totalCarbs = foodLogs.reduce((sum, log) => sum + (log.carbs || 0), 0);
+    const totalFat = foodLogs.reduce((sum, log) => sum + (log.fat || 0), 0);
     const totalCaloriesOut = activityLogs.reduce((sum, log) => sum + log.caloriesBurned, 0);
     const totalWater = waterLogs.reduce((sum, log) => sum + log.amount, 0);
     const netCalories = totalCaloriesIn - totalCaloriesOut;
@@ -45,6 +48,9 @@ export const getDailySummary = async (req, res) => {
       status: "success",
       summary: {
         totalCaloriesIn,
+        totalProtein,
+        totalCarbs,
+        totalFat,
         totalCaloriesOut,
         netCalories,
         totalWater,
@@ -90,6 +96,9 @@ export const getWeeklyTrend = async (req, res) => {
     });
 
     const totalCaloriesIn = foodLogs.reduce((sum, log) => sum + log.calories, 0);
+    const totalProtein = foodLogs.reduce((sum, log) => sum + (log.protein || 0), 0);
+    const totalCarbs = foodLogs.reduce((sum, log) => sum + (log.carbs || 0), 0);
+    const totalFat = foodLogs.reduce((sum, log) => sum + (log.fat || 0), 0);
     const totalCaloriesOut = activityLogs.reduce((sum, log) => sum + log.caloriesBurned, 0);
     const totalWater = waterLogs.reduce((sum, log) => sum + log.amount, 0);
 
@@ -97,6 +106,9 @@ export const getWeeklyTrend = async (req, res) => {
       status: "success",
       weeklySummary: {
         totalCaloriesIn,
+        totalProtein,
+        totalCarbs,
+        totalFat,
         totalCaloriesOut,
         netCalories: totalCaloriesIn - totalCaloriesOut,
         totalWater,

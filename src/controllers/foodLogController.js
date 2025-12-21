@@ -3,8 +3,8 @@ import User from "../models/User.js";
 
 export const createFoodLog = async (req, res) => {
   try {
-    const userId = req.user.id; 
-    const { foodName, calories, mealTime, portion, date } = req.body;
+    const userId = req.user.id;
+    const { foodName, calories, protein, carbs, fat, mealTime, portion, date } = req.body;
 
     const user = await User.findById(userId);
     if (!user) {
@@ -15,6 +15,9 @@ export const createFoodLog = async (req, res) => {
       user: userId,
       foodName,
       calories,
+      protein,
+      carbs,
+      fat,
       mealTime,
       portion,
       date,
