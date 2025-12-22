@@ -19,10 +19,21 @@ export const addWeightProgress = async (req, res) => {
       note,
     });
 
+    // Update current weight in User profile
+    user.weight = weight;
+    await user.save();
+
+    // Calculate current BMI
+    const heightInMeters = user.height / 100;
+    const bmi = user.height ? (weight / (heightInMeters * heightInMeters)).toFixed(1) : null;
+
     res.status(201).json({
       status: "success",
-      message: "Berat badan berhasil dicatat",
-      data: log,
+      message: "Berat badan berhasil dicatat dan profil diperbarui",
+      data: {
+        ...log._doc,
+        currentBMI: bmi
+      },
     });
   } catch (error) {
     res.status(500).json({ status: "error", message: error.message });

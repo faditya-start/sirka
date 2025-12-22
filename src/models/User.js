@@ -7,9 +7,15 @@ const userSchema = new mongoose.Schema(
     email: { type: String, required: true, unique: true },
     password: { type: String, required: true },
     age: { type: Number, required: false },
+    gender: { type: String, enum: ["pria", "wanita"], required: false },
     weight: { type: Number, required: false },
     height: { type: Number, required: false },
-    goal: { type: String, required: false }, 
+    goal: { type: String, enum: ["Turun Berat Badan", "Maintain", "Naik Berat Badan"], required: false },
+    activityLevel: {
+      type: Number,
+      default: 1.2, // Sedentary (little or no exercise)
+      required: false
+    },
   },
   { timestamps: true }
 );

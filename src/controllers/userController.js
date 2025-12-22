@@ -1,5 +1,6 @@
 import User from "../models/User.js";
 import jwt from "jsonwebtoken";
+import { calculateBMI, calculateBMR, calculateDailyCalorieTarget } from "../utils/healthCalculations.js";
 
 const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "7d" });
@@ -7,14 +8,14 @@ const generateToken = (id) => {
 
 export const registerUser = async (req, res) => {
   try {
-    const { name, email, password, age, weight, height, goal } = req.body;
+    const { name, email, password, age, weight, height, goal, gender, activityLevel } = req.body;
 
     const userExists = await User.findOne({ email });
     if (userExists) {
       return res.status(400).json({ status: "error", message: "Email sudah terdaftar" });
     }
 
-    const user = await User.create({ name, email, password, age, weight, height, goal });
+    const user = await User.create({ name, email, password, age, weight, height, goal, gender, activityLevel });
 
     res.status(201).json({
       status: "success",
@@ -59,6 +60,53 @@ export const getAllUsers = async (req, res) => {
   try {
     const users = await User.find().select("-password");
     res.json({ status: "success", data: users });
+  } catch (error) {
+    res.status(500).json({ status: "error", message: error.message });
+  }
+};
+
+export const getUserProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id).select("-password");
+    if (!user) {
+      return res.status(404).json({ status: "error", message: "User tidak ditemukan" });
+    }
+
+    const bmi = calculateBMI(user.weight, user.height);
+    const bmr = calculateBMR(user.weight, user.height, user.age, user.gender);
+    const calorieTarget = calculateDailyCalorieTarget(bmr, user.activityLevel, user.goal);
+
+    res.json({
+      status: "success",
+      data: {
+        ...user._doc,
+        healthAnalysis: {
+          bmi,
+          bmr,
+          dailyCalorieTarget: calorieTarget
+        }
+      }
+    });
+  } catch (error) {
+    res.status(500).json({ status: "error", message: error.message });
+  }
+};
+
+export const updateUserProfile = async (req, res) => {
+  try {
+    const user = await User.findById(req.user.id);
+    if (!user) {
+      return res.status(404).json({ status: "error", message: "User tidak ditemukan" });
+    }
+
+    Object.assign(user, req.body);
+    await user.save();
+
+    res.json({
+      status: "success",
+      message: "Profil berhasil diperbarui",
+      data: user
+    });
   } catch (error) {
     res.status(500).json({ status: "error", message: error.message });
   }
