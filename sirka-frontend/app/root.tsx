@@ -41,7 +41,29 @@ export function Layout({ children }: { children: React.ReactNode }) {
   );
 }
 
+import { useEffect } from "react";
+import { useAuthStore } from "./store/authStore";
+import api from "./services/api";
+
 export default function App() {
+  const { token, setAuth, logout } = useAuthStore();
+
+  useEffect(() => {
+    const initAuth = async () => {
+      if (token && !useAuthStore.getState().user) {
+        try {
+          const response = await api.get("/users/profile");
+          setAuth(response.data.data, token);
+        } catch (err) {
+          console.error("Auth initialization failed:", err);
+          logout();
+        }
+      }
+    };
+
+    initAuth();
+  }, [token, setAuth, logout]);
+
   return <Outlet />;
 }
 

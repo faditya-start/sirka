@@ -1,3 +1,4 @@
+"use client";
 import { create } from "zustand";
 
 interface User {
@@ -7,7 +8,7 @@ interface User {
     [key: string]: any;
 }
 
-interface AuthState {
+export interface AuthState {
     user: User | null;
     token: string | null;
     isAuthenticated: boolean;
@@ -16,22 +17,29 @@ interface AuthState {
     updateUser: (user: User) => void;
 }
 
+const initialToken = typeof window !== "undefined" ? localStorage.getItem("sirka_token") : null;
+const initialIsAuthenticated = !!initialToken;
+
 export const useAuthStore = create<AuthState>((set) => ({
     user: null,
-    token: typeof window !== "undefined" ? localStorage.getItem("sirka_token") : null,
-    isAuthenticated: false,
+    token: initialToken,
+    isAuthenticated: initialIsAuthenticated,
 
     setAuth: (user, token) => {
-        localStorage.setItem("sirka_token", token);
-        set({ user, token, isAuthenticated: true });
+        if (typeof window !== "undefined") {
+            localStorage.setItem("sirka_token", token);
+        }
+        set((state) => ({ ...state, user, token, isAuthenticated: true }));
     },
 
     logout: () => {
-        localStorage.removeItem("sirka_token");
-        set({ user: null, token: null, isAuthenticated: false });
+        if (typeof window !== "undefined") {
+            localStorage.removeItem("sirka_token");
+        }
+        set((state) => ({ ...state, user: null, token: null, isAuthenticated: false }));
     },
 
     updateUser: (user) => {
-        set({ user });
+        set((state) => ({ ...state, user }));
     },
 }));
