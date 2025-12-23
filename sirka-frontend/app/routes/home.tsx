@@ -83,10 +83,17 @@ export default function Home() {
             <div className="glass p-8 rounded-3xl premium-shadow">
               <h2 className="text-xl font-bold text-slate-900 mb-6">Akses Cepat</h2>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-                {['Makan', 'Olahraga', 'Berat', 'Profil'].map((item) => (
+                <Link to="/food-log" className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-slate-50 hover:bg-white hover:shadow-md border border-transparent hover:border-slate-100 transition-all group">
+                  <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
+                    🍎
+                  </div>
+                  <span className="text-sm font-medium text-slate-600">Makan</span>
+                </Link>
+
+                {['Olahraga', 'Berat', 'Profil'].map((item) => (
                   <button key={item} className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-slate-50 hover:bg-white hover:shadow-md border border-transparent hover:border-slate-100 transition-all group">
                     <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
-                      {item === 'Makan' ? '🍎' : item === 'Olahraga' ? '🏃' : item === 'Berat' ? '⚖️' : '👤'}
+                      {item === 'Olahraga' ? '🏃' : item === 'Berat' ? '⚖️' : '👤'}
                     </div>
                     <span className="text-sm font-medium text-slate-600">{item}</span>
                   </button>
