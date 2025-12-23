@@ -15,7 +15,7 @@ export default function Home() {
       <nav className="glass sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
           <span className="text-2xl">🥗</span>
-          <span className="text-xl font-bold bg-clip-text text-transparent premium-gradient">SIRKA</span>
+          <span className="text-xl font-bold">SIRKA</span>
         </div>
 
         <div className="flex items-center gap-4">
@@ -101,14 +101,14 @@ export default function Home() {
             </div>
             <h1 className="text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
               Kesehatanmu adalah <br />
-              <span className="bg-clip-text text-transparent premium-gradient">Investasi Terbaik.</span>
+              <span className="">Investasi Terbaik.</span>
             </h1>
             <p className="text-xl text-slate-500 mt-6 max-w-2xl mx-auto">
               Pantau nutrisi, aktivitas fisik, dan progres berat badanmu dengan cara yang cerdas dan menyenangkan.
             </p>
             <div className="mt-10 flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link to="/register" className="btn-primary px-10 py-4 text-lg w-full sm:w-auto">
-                Mulai Sekarang — Gratis
+                Mulai Sekarang
               </Link>
               <Link to="/login" className="px-10 py-4 text-lg font-bold text-slate-600 hover:text-emerald-600 transition-colors w-full sm:w-auto">
                 Sudah punya akun?

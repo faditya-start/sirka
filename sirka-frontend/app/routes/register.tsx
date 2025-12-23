@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router";
 import api from "../services/api";
+import { useAuthStore, type AuthState } from "../store/authStore";
 
 export default function Register() {
     const [formData, setFormData] = useState({
@@ -10,6 +11,8 @@ export default function Register() {
     });
     const [error, setError] = useState("");
     const [loading, setLoading] = useState(false);
+
+    const setAuth = useAuthStore((state: AuthState) => state.setAuth);
     const navigate = useNavigate();
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -22,8 +25,11 @@ export default function Register() {
         setError("");
 
         try {
-            await api.post("/users/register", formData);
-            navigate("/login");
+            const response = await api.post("/users/register", formData);
+            const { data } = response.data;
+
+            setAuth(data, data.token);
+            navigate("/onboarding");
         } catch (err: any) {
             setError(err.response?.data?.message || "Registrasi gagal. Silakan coba lagi.");
         } finally {
