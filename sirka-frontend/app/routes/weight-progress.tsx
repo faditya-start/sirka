@@ -169,7 +169,7 @@ export default function WeightProgress() {
 
     return (
         <div className="min-h-screen bg-slate-50 pb-20">
-            <nav className="glass sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
+            <nav className="glass sticky top-0 z-50 px-6 py-4 flex items-center justify-between md:hidden">
                 <Link to="/" className="flex items-center gap-2">
                     <i className="lni lni-chevron-left font-bold text-slate-700"></i>
                     <span className="font-bold text-slate-700">Kembali</span>
@@ -179,6 +179,10 @@ export default function WeightProgress() {
             </nav>
 
             <main className="max-w-2xl mx-auto p-6 space-y-8">
+                <header className="hidden md:block">
+                    <h1 className="text-3xl font-bold text-slate-900">Progres Berat Badan</h1>
+                    <p className="text-slate-500 mt-1">Pantau perjalanan berat badan dan BMI Anda.</p>
+                </header>
                 {/* BMI Card */}
                 <div className="glass p-8 rounded-3xl premium-shadow flex flex-col items-center justify-center text-center relative overflow-hidden">
                     <div className={`absolute inset-0 opacity-10 ${bmiInfo.bg}`}></div>
@@ -229,7 +233,7 @@ export default function WeightProgress() {
 
             <button
                 onClick={() => setShowAddModal(true)}
-                className="fixed bottom-8 right-8 w-16 h-16 rounded-full bg-emerald-600 text-white text-3xl shadow-xl hover:scale-110 active:scale-95 transition-all flex items-center justify-center"
+                className="fixed bottom-28 md:bottom-8 right-8 w-16 h-16 rounded-full bg-emerald-600 text-white text-3xl shadow-xl hover:scale-110 active:scale-95 transition-all flex items-center justify-center z-[90]"
             >
                 <i className="lni lni-plus"></i>
             </button>

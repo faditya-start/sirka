@@ -70,34 +70,6 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-slate-50">
-      {/* Navigation */}
-      <nav className="glass sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <i className="lni lni-service-bell-1 text-emerald-600" style={{ fontSize: "1.5rem" }}></i>
-          <span className="text-xl font-bold">SIRKA</span>
-        </div>
-
-        <div className="flex items-center gap-4">
-          {isAuthenticated ? (
-            <>
-              <span className="text-sm font-medium text-slate-600">Halo, {user?.name}</span>
-              <button onClick={() => logout()} className="text-sm font-semibold text-red-500 hover:text-red-600">
-                Keluar
-              </button>
-            </>
-          ) : (
-            <>
-              <Link to="/login" className="text-sm font-semibold text-slate-600 hover:text-emerald-600 transition-colors">
-                Masuk
-              </Link>
-              <Link to="/register" className="btn-primary text-sm px-5 py-2">
-                Daftar
-              </Link>
-            </>
-          )}
-        </div>
-      </nav>
-
       <main className="max-w-4xl mx-auto p-6 pt-12">
         {isAuthenticated ? (
           <div className="space-y-8">
@@ -184,21 +156,21 @@ export default function Home() {
                 {['Olahraga', 'Berat', 'Profil'].map((item) => (
                   item === 'Berat' ? (
                     <Link key={item} to="/weight-progress" className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-slate-50 hover:bg-white hover:shadow-md border border-transparent hover:border-slate-100 transition-all group">
-                      <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center text-xl group-hover:scale-110 transition-transform text-slate-600">
+                      <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center text-xl group-hover:scale-110 transition-transform text-emerald-600">
                         <i className="lni lni-bar-chart-4"></i>
                       </div>
                       <span className="text-sm font-medium text-slate-600">{item}</span>
                     </Link>
                   ) : item === 'Profil' ? (
                     <Link key={item} to="/profile" className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-slate-50 hover:bg-white hover:shadow-md border border-transparent hover:border-slate-100 transition-all group">
-                      <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center text-xl group-hover:scale-110 transition-transform text-slate-600">
+                      <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center text-xl group-hover:scale-110 transition-transform text-emerald-600">
                         <i className="lni lni-user-4"></i>
                       </div>
                       <span className="text-sm font-medium text-slate-600">{item}</span>
                     </Link>
                   ) : (
                     <Link key={item} to="/exercise" className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-slate-50 hover:bg-white hover:shadow-md border border-transparent hover:border-slate-100 transition-all group">
-                      <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center text-xl group-hover:scale-110 transition-transform text-slate-600">
+                      <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center text-xl group-hover:scale-110 transition-transform text-emerald-600">
                         <i className="lni lni-dumbbell-1"></i>
                       </div>
                       <span className="text-sm font-medium text-slate-600">{item}</span>

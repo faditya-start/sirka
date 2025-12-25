@@ -45,6 +45,7 @@ export function Layout({ children }: { children: React.ReactNode }) {
 import { useEffect } from "react";
 import { useAuthStore } from "./store/authStore";
 import api from "./services/api";
+import Navigation from "./components/Navigation";
 
 export default function App() {
   const { token, setAuth, logout } = useAuthStore();
@@ -65,7 +66,12 @@ export default function App() {
     initAuth();
   }, [token, setAuth, logout]);
 
-  return <Outlet />;
+  return (
+    <>
+      <Navigation />
+      <Outlet />
+    </>
+  );
 }
 
 export function ErrorBoundary({ error }: Route.ErrorBoundaryProps) {

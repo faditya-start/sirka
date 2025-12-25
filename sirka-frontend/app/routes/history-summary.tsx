@@ -312,7 +312,7 @@ export default function HistorySummary() {
 
     return (
         <div className="min-h-screen bg-slate-50 pb-20">
-            <nav className="glass sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
+            <nav className="glass sticky top-0 z-50 px-6 py-4 flex items-center justify-between md:hidden">
                 <Link to="/" className="flex items-center gap-2">
                     <i className="lni lni-chevron-left font-bold text-slate-700"></i>
                     <span className="font-bold text-slate-700">Kembali</span>
@@ -322,6 +322,10 @@ export default function HistorySummary() {
             </nav>
 
             <main className="max-w-4xl mx-auto p-6 space-y-8">
+                <header className="hidden md:block">
+                    <h1 className="text-3xl font-bold text-slate-900">Histori & Laporan</h1>
+                    <p className="text-slate-500 mt-1">Pantau tren kesehatan harian Anda secara mendalam.</p>
+                </header>
                 {/* Period Selector */}
                 <div className="flex p-1 bg-slate-100 rounded-2xl w-full">
                     {(["daily", "weekly", "monthly", "yearly"] as const).map((p) => (
@@ -372,7 +376,7 @@ export default function HistorySummary() {
                 </div>
 
                 {/* Charts */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
                     <div className="glass p-6 rounded-3xl premium-shadow bg-white">
                         <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
                             <i className="lni lni-fire text-emerald-500"></i> Tren Kalori

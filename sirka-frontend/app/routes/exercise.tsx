@@ -99,7 +99,7 @@ export default function Exercise() {
     return (
         <div className="min-h-screen bg-slate-50 pb-20">
             {/* Header */}
-            <nav className="glass sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
+            <nav className="glass sticky top-0 z-50 px-6 py-4 flex items-center justify-between md:hidden">
                 <Link to="/" className="flex items-center gap-2">
                     <i className="lni lni-chevron-left font-bold text-slate-700"></i>
                     <span className="font-bold text-slate-700">Kembali</span>
@@ -108,7 +108,11 @@ export default function Exercise() {
                 <div className="w-10"></div>
             </nav>
 
-            <main className="max-w-2xl mx-auto p-6 space-y-8">
+            <main className="max-w-2xl mx-auto p-6 space-y-8 text-slate-900">
+                <header className="hidden md:block">
+                    <h1 className="text-3xl font-bold">Aktivitas Fisik</h1>
+                    <p className="text-slate-500 mt-1">Catat dan pantau aktivitas olahraga harian Anda.</p>
+                </header>
                 {/* Summary Card */}
                 <div className="p-6 rounded-3xl bg-white premium-shadow relative overflow-hidden">
                     <div className="absolute right-0 top-0 w-32 h-32 bg-orange-100 rounded-bl-[100px] -mr-10 -mt-10 z-0"></div>
@@ -178,7 +182,7 @@ export default function Exercise() {
             {/* FAB */}
             <button
                 onClick={() => setShowAddModal(true)}
-                className="fixed bottom-8 right-8 w-16 h-16 rounded-full bg-emerald-600 text-white text-3xl shadow-xl hover:scale-110 active:scale-95 transition-all flex items-center justify-center"
+                className="fixed bottom-28 md:bottom-8 right-8 w-16 h-16 rounded-full bg-emerald-600 text-white text-3xl shadow-xl hover:scale-110 active:scale-95 transition-all flex items-center justify-center z-[90]"
             >
                 <i className="lni lni-plus"></i>
             </button>

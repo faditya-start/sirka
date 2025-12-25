@@ -77,15 +77,6 @@ export default function Profile() {
 
     return (
         <div className="min-h-screen bg-slate-50 pb-20">
-            {/* Header */}
-            <nav className="glass sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
-                <Link to="/" className="flex items-center gap-2">
-                    <i className="lni lni-chevron-left font-bold text-slate-700"></i>
-                    <span className="font-bold text-slate-700">Kembali</span>
-                </Link>
-                <h1 className="text-lg font-bold text-slate-900">Profil Saya</h1>
-                <div className="w-10"></div>
-            </nav>
 
             <main className="max-w-2xl mx-auto p-6 space-y-8">
                 {/* Profile Card */}

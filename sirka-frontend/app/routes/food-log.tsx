@@ -108,7 +108,7 @@ export default function FoodLog() {
     return (
         <div className="min-h-screen bg-slate-50 pb-20">
             {/* Header */}
-            <nav className="glass sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
+            <nav className="glass sticky top-0 z-50 px-6 py-4 flex items-center justify-between md:hidden">
                 <Link to="/" className="flex items-center gap-2">
                     <i className="lni lni-chevron-left font-bold text-slate-700"></i>
                     <span className="font-bold text-slate-700">Kembali</span>
@@ -118,6 +118,10 @@ export default function FoodLog() {
             </nav>
 
             <main className="max-w-2xl mx-auto p-6 space-y-8">
+                <header className="hidden md:block">
+                    <h1 className="text-3xl font-bold text-slate-900">Catatan Makanan</h1>
+                    <p className="text-slate-500 mt-1">Pantau asupan nutrisi harian Anda.</p>
+                </header>
                 {/* Quick Summary Card */}
                 <div className="p-6 rounded-3xl">
                     <p className="text-green-600 text-xl font-medium">Total Kalori Hari Ini</p>
@@ -185,7 +189,7 @@ export default function FoodLog() {
             {/* Floating Action Button */}
             <button
                 onClick={() => setShowAddModal(true)}
-                className="fixed bottom-8 right-8 w-16 h-16 rounded-full bg-emerald-600 text-white text-3xl shadow-xl hover:scale-110 active:scale-95 transition-all flex items-center justify-center"
+                className="fixed bottom-28 md:bottom-8 right-8 w-16 h-16 rounded-full bg-emerald-600 text-white text-3xl shadow-xl hover:scale-110 active:scale-95 transition-all flex items-center justify-center z-[90]"
             >
                 <i className="lni lni-plus"></i>
             </button>
