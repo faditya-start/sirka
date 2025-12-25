@@ -8,4 +8,5 @@ export default [
     route("food-log", "routes/food-log.tsx"),
     route("weight-progress", "routes/weight-progress.tsx"),
     route("profile", "routes/profile.tsx"),
+    route("exercise", "routes/exercise.tsx"),
 ] satisfies RouteConfig;
