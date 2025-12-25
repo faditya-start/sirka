@@ -9,4 +9,5 @@ export default [
     route("weight-progress", "routes/weight-progress.tsx"),
     route("profile", "routes/profile.tsx"),
     route("exercise", "routes/exercise.tsx"),
+    route("history", "routes/history-summary.tsx"),
 ] satisfies RouteConfig;

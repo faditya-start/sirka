@@ -1,15 +1,7 @@
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
-// import api from "../services/api"; // Uncomment when API is ready
+import api from "../services/api";
 import { useAuthStore, type AuthState } from "../store/authStore";
-
-// Mock API for now since backend might not have this endpoint yet
-// In a real scenario, this would import the actual api instance
-const api = {
-    get: async (url: string) => ({ data: { data: [] } }),
-    post: async (url: string, data: any) => ({ data: { data: { ...data, _id: Date.now().toString() } } }),
-    delete: async (url: string) => ({ data: {} })
-};
 
 interface ActivityEntry {
     _id: string;
@@ -41,40 +33,38 @@ export default function Exercise() {
             navigate("/login");
             return;
         }
-        // fetchLogs(); // Uncomment when API is ready
-        setLoading(false);
+        fetchLogs();
     }, [isAuthenticated, navigate]);
 
-    /* 
-    // Real API implementation
     const fetchLogs = async () => {
         try {
-            const response = await api.get("/activities");
-            setLogs(response.data.data);
+            const todayShort = new Date().toLocaleDateString('en-CA');
+            const response = await api.get("/activitylogs");
+            const allLogs = response.data.data || [];
+
+            const todaysLogs = allLogs.filter((log: any) =>
+                new Date(log.date).toLocaleDateString('en-CA') === todayShort
+            );
+
+            setLogs(todaysLogs);
         } catch (err) {
             console.error("Gagal mengambil data aktivitas:", err);
         } finally {
             setLoading(false);
         }
     };
-    */
 
     const handleAddActivity = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            // Simulated API call
-            const newLog: ActivityEntry = {
-                _id: Date.now().toString(),
-                activityName: formData.activityName,
+            const response = await api.post("/activitylogs", {
+                ...formData,
                 duration: parseFloat(formData.duration),
                 caloriesBurned: parseFloat(formData.caloriesBurned),
-                activityType: formData.activityType as any,
-                date: new Date().toISOString(),
-            };
+                date: new Date().toISOString()
+            });
 
-            // const response = await api.post("/activities", ...); 
-            setLogs([newLog, ...logs]);
-
+            setLogs([response.data.data, ...logs]);
             setShowAddModal(false);
             setFormData({
                 activityName: "",
@@ -95,7 +85,7 @@ export default function Exercise() {
     const confirmDelete = async () => {
         if (!selectedLogId) return;
         try {
-            // await api.delete(`/activities/${selectedLogId}`);
+            await api.delete(`/activitylogs/${selectedLogId}`);
             setLogs(logs.filter(log => log._id !== selectedLogId));
             setShowDeleteModal(false);
             setSelectedLogId(null);

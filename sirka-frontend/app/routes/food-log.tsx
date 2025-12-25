@@ -43,8 +43,16 @@ export default function FoodLog() {
 
     const fetchLogs = async () => {
         try {
-            const response = await api.get("/foodlogs"); // Backend gets by user from token
-            setLogs(response.data.data);
+            const todayShort = new Date().toLocaleDateString('en-CA');
+            const response = await api.get("/foodlogs");
+            const allLogs = response.data.data || [];
+
+            // Filter only for today
+            const todaysLogs = allLogs.filter((log: any) =>
+                new Date(log.date).toLocaleDateString('en-CA') === todayShort
+            );
+
+            setLogs(todaysLogs);
         } catch (err) {
             console.error("Gagal mengambil logs:", err);
         } finally {
