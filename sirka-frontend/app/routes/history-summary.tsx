@@ -113,8 +113,11 @@ export default function HistorySummary() {
                 };
             });
 
-            const cals = last12Months.map(m => {
-                return (logs.foodLogs || [])
+            const foodList = logs.foodLogs || logs.foods || [];
+            const activityList = logs.activityLogs || logs.activities || [];
+
+            const calsIn = last12Months.map(m => {
+                return foodList
                     .filter((l: any) => {
                         const d = new Date(l.date);
                         return d.getMonth() === m.month && d.getFullYear() === m.year;
@@ -122,8 +125,17 @@ export default function HistorySummary() {
                     .reduce((sum: number, l: any) => sum + (l.calories || 0), 0);
             });
 
+            const calsOut = last12Months.map(m => {
+                return activityList
+                    .filter((l: any) => {
+                        const d = new Date(l.date);
+                        return d.getMonth() === m.month && d.getFullYear() === m.year;
+                    })
+                    .reduce((sum: number, l: any) => sum + (l.caloriesBurned || 0), 0);
+            });
+
             const water = last12Months.map(m => {
-                return (logs.waterLogs || [])
+                return (logs.waterLogs || logs.water || [])
                     .filter((l: any) => {
                         const d = new Date(l.date);
                         return d.getMonth() === m.month && d.getFullYear() === m.year;
@@ -134,12 +146,30 @@ export default function HistorySummary() {
             return {
                 calories: {
                     labels: last12Months.map(m => m.label),
-                    datasets: [{
-                        label: 'Kalori (kcal)',
-                        data: cals,
-                        backgroundColor: '#10b981',
-                        borderRadius: 4,
-                    }]
+                    datasets: [
+                        {
+                            label: 'Asupan',
+                            data: calsIn,
+                            backgroundColor: '#10b981',
+                            borderRadius: 4,
+                        },
+                        {
+                            label: 'Bakar',
+                            data: calsOut,
+                            backgroundColor: '#f59e0b',
+                            borderRadius: 4,
+                        },
+                        {
+                            label: 'Netto',
+                            data: calsIn.map((inc, idx) => inc - calsOut[idx]),
+                            type: 'line' as const,
+                            borderColor: '#3b82f6',
+                            borderWidth: 2,
+                            fill: false,
+                            pointRadius: 0,
+                            tension: 0.4
+                        }
+                    ]
                 },
                 water: {
                     labels: last12Months.map(m => m.label),
@@ -163,14 +193,23 @@ export default function HistorySummary() {
             return d.toLocaleDateString('en-CA');
         });
 
-        const dailyCals = dateLabels.map(date => {
-            return (logs.foodLogs || [])
+        const foodList = logs.foodLogs || logs.foods || [];
+        const activityList = logs.activityLogs || logs.activities || [];
+
+        const dailyCalsIn = dateLabels.map(date => {
+            return foodList
                 .filter((l: any) => new Date(l.date).toLocaleDateString('en-CA') === date)
                 .reduce((sum: number, l: any) => sum + (l.calories || 0), 0);
         });
 
+        const dailyCalsOut = dateLabels.map(date => {
+            return activityList
+                .filter((l: any) => new Date(l.date).toLocaleDateString('en-CA') === date)
+                .reduce((sum: number, l: any) => sum + (l.caloriesBurned || 0), 0);
+        });
+
         const dailyWater = dateLabels.map(date => {
-            return (logs.waterLogs || [])
+            return (logs.waterLogs || logs.water || [])
                 .filter((l: any) => new Date(l.date).toLocaleDateString('en-CA') === date)
                 .reduce((sum: number, l: any) => sum + (l.amount || 0), 0);
         });
@@ -178,12 +217,30 @@ export default function HistorySummary() {
         return {
             calories: {
                 labels: dateLabels.map(d => d.split('-').slice(1).reverse().join('/')),
-                datasets: [{
-                    label: 'Kalori (kcal)',
-                    data: dailyCals,
-                    backgroundColor: '#10b981',
-                    borderRadius: period === "weekly" ? 8 : 2,
-                }]
+                datasets: [
+                    {
+                        label: 'Asupan',
+                        data: dailyCalsIn,
+                        backgroundColor: '#10b981',
+                        borderRadius: period === "weekly" ? 8 : 2,
+                    },
+                    {
+                        label: 'Bakar',
+                        data: dailyCalsOut,
+                        backgroundColor: '#f59e0b',
+                        borderRadius: period === "weekly" ? 8 : 2,
+                    },
+                    {
+                        label: 'Netto',
+                        data: dailyCalsIn.map((inc, idx) => inc - dailyCalsOut[idx]),
+                        type: 'line' as const,
+                        borderColor: '#3b82f6',
+                        borderWidth: 2,
+                        fill: false,
+                        pointRadius: 0,
+                        tension: 0.4
+                    }
+                ]
             },
             water: {
                 labels: dateLabels.map(d => d.split('-').slice(1).reverse().join('/')),
@@ -238,14 +295,14 @@ export default function HistorySummary() {
                 {/* Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="glass p-6 rounded-3xl premium-shadow border-emerald-50 bg-white">
-                        <p className="text-slate-500 text-sm font-medium">Total Kalori</p>
+                        <p className="text-slate-500 text-sm font-medium">Kalori (Asupan vs Bakar)</p>
                         <div className="text-3xl font-black text-slate-900 mt-1">
-                            {summary?.totalCaloriesIn?.toLocaleString('id-ID') || 0} <span className="text-xs font-normal text-slate-400">kcal</span>
+                            {summary?.totalCaloriesIn?.toLocaleString('id-ID') || 0} <span className="text-xs font-normal text-slate-400">vs</span> {summary?.totalCaloriesOut?.toLocaleString('id-ID') || 0}
                         </div>
-                        <p className="text-xs text-slate-400 mt-2">
-                            {period === 'daily' ? 'Kalori Bakar (Olahraga): ' : 'Kalori Keluar: '}
-                            {summary?.totalCaloriesOut?.toLocaleString('id-ID') || 0} kcal
-                        </p>
+                        <div className={`text-xs font-bold mt-2 flex items-center gap-1 ${summary?.netCalories <= 0 ? 'text-emerald-500' : 'text-orange-500'}`}>
+                            <i className="lni lni-calculator"></i>
+                            Netto: {summary?.netCalories?.toLocaleString('id-ID') || 0} kcal
+                        </div>
                     </div>
                     <div className="glass p-6 rounded-3xl premium-shadow border-blue-50 bg-white">
                         <p className="text-slate-500 text-sm font-medium">Asupan Air</p>
@@ -277,7 +334,7 @@ export default function HistorySummary() {
                             <i className="lni lni-fire text-emerald-500"></i> Tren Kalori
                         </h3>
                         <div className="h-64">
-                            <Bar data={charts.calories} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }} />
+                            <Bar data={charts.calories as any} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'bottom' as const, labels: { boxWidth: 12, font: { size: 10 } } } } }} />
                         </div>
                     </div>
                     <div className="glass p-6 rounded-3xl premium-shadow bg-white">

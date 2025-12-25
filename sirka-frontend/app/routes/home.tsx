@@ -8,6 +8,7 @@ export default function Home() {
   const navigate = useNavigate();
 
   const [todayCalories, setTodayCalories] = useState(0);
+  const [burnedCalories, setBurnedCalories] = useState(0);
   const [todayWater, setTodayWater] = useState(0);
 
   // Calculate goal based on user data or default to 2000
@@ -43,6 +44,14 @@ export default function Home() {
         new Date(log.date).toLocaleDateString('en-CA') === todayShort
       );
       setTodayWater(todaysWater.reduce((sum, log) => sum + (log.amount || 0), 0));
+
+      // 3. Fetch Activity Logs & Filter for Today
+      const activityResponse = await api.get("/activitylogs");
+      const activityLogs: any[] = activityResponse.data.data || [];
+      const todaysActivity = activityLogs.filter((log: any) =>
+        new Date(log.date).toLocaleDateString('en-CA') === todayShort
+      );
+      setBurnedCalories(todaysActivity.reduce((sum, log) => sum + (log.caloriesBurned || 0), 0));
 
     } catch (err) {
       console.error("Failed to fetch dashboard data", err);
@@ -109,9 +118,15 @@ export default function Home() {
                 <h2 className="text-lg font-bold text-emerald-900 mb-4 flex items-center gap-2 relative z-10">
                   <i className="lni lni-fire"></i> Kalori Hari Ini
                 </h2>
-                <div className="flex items-baseline gap-2 relative z-10">
-                  <span className="text-4xl font-extrabold text-emerald-600">{todayCalories}</span>
-                  <span className="text-slate-500 font-medium">/ {calorieGoal} kcal</span>
+                <div className="flex items-baseline justify-between relative z-10">
+                  <div className="flex items-baseline gap-2">
+                    <span className="text-4xl font-extrabold text-emerald-600">{todayCalories}</span>
+                    <span className="text-slate-500 font-medium">/ {calorieGoal} kcal</span>
+                  </div>
+                  <div className="text-right">
+                    <p className="text-xs text-orange-600 font-bold">Bakar: {burnedCalories} kcal</p>
+                    <p className="text-[10px] text-slate-400">Netto: {todayCalories - burnedCalories} kcal</p>
+                  </div>
                 </div>
                 <div className="mt-4 w-full bg-emerald-100 rounded-full h-3 relative z-10">
                   <div
