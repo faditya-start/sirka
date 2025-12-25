@@ -29,9 +29,9 @@ ChartJS.register(
 );
 
 export default function HistorySummary() {
-    const { isAuthenticated } = useAuthStore((state: AuthState) => state);
+    const { isAuthenticated, user } = useAuthStore((state: AuthState) => state);
     const navigate = useNavigate();
-    const [period, setPeriod] = useState<"daily" | "weekly">("weekly");
+    const [period, setPeriod] = useState<"daily" | "weekly" | "monthly" | "yearly">("weekly");
     const [loading, setLoading] = useState(true);
     const [summary, setSummary] = useState<any>(null);
     const [logs, setLogs] = useState<any>(null);
@@ -47,14 +47,23 @@ export default function HistorySummary() {
     const fetchHistoryData = async () => {
         setLoading(true);
         try {
+            let response;
             if (period === "daily") {
                 const today = new Date().toLocaleDateString('en-CA');
-                const response = await api.get(`/history/daily?date=${today}`);
+                response = await api.get(`/history/daily?date=${today}`);
                 setSummary(response.data.summary);
                 setLogs(response.data.details);
-            } else {
-                const response = await api.get("/history/weekly");
+            } else if (period === "weekly") {
+                response = await api.get("/history/weekly");
                 setSummary(response.data.weeklySummary);
+                setLogs(response.data.logs);
+            } else if (period === "monthly") {
+                response = await api.get("/history/monthly");
+                setSummary(response.data.monthlySummary);
+                setLogs(response.data.logs);
+            } else if (period === "yearly") {
+                response = await api.get("/history/yearly");
+                setSummary(response.data.yearlySummary);
                 setLogs(response.data.logs);
             }
         } catch (err) {
@@ -64,10 +73,10 @@ export default function HistorySummary() {
         }
     };
 
-    // Helper to group logs by date for charts
     const getChartData = () => {
-        if (!logs || period === "daily") {
-            // Daily breakdown (by meal time or simple stats)
+        if (!logs) return { calories: { labels: [], datasets: [] }, water: { labels: [], datasets: [] } };
+
+        if (period === "daily") {
             return {
                 calories: {
                     labels: ["Asupan", "Bakar", "Netto"],
@@ -79,7 +88,7 @@ export default function HistorySummary() {
                     }]
                 },
                 water: {
-                    labels: ["Pagi", "Siang", "Malam"], // Simplified
+                    labels: ["Pagi", "Siang", "Malam"],
                     datasets: [{
                         label: 'Air (ml)',
                         data: [summary?.totalWater || 0, 0, 0],
@@ -91,35 +100,93 @@ export default function HistorySummary() {
             };
         }
 
-        // Weekly logic: group by last 7 days
-        const last7Days = [...Array(7)].map((_, i) => {
+        if (period === "yearly") {
+            // Group by month for last 12 months
+            const months = ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"];
+            const now = new Date();
+            const last12Months = [...Array(12)].map((_, i) => {
+                const d = new Date(now.getFullYear(), now.getMonth() - (11 - i), 1);
+                return {
+                    label: months[d.getMonth()] + " " + d.getFullYear().toString().slice(-2),
+                    month: d.getMonth(),
+                    year: d.getFullYear()
+                };
+            });
+
+            const cals = last12Months.map(m => {
+                return (logs.foodLogs || [])
+                    .filter((l: any) => {
+                        const d = new Date(l.date);
+                        return d.getMonth() === m.month && d.getFullYear() === m.year;
+                    })
+                    .reduce((sum: number, l: any) => sum + (l.calories || 0), 0);
+            });
+
+            const water = last12Months.map(m => {
+                return (logs.waterLogs || [])
+                    .filter((l: any) => {
+                        const d = new Date(l.date);
+                        return d.getMonth() === m.month && d.getFullYear() === m.year;
+                    })
+                    .reduce((sum: number, l: any) => sum + (l.amount || 0), 0);
+            });
+
+            return {
+                calories: {
+                    labels: last12Months.map(m => m.label),
+                    datasets: [{
+                        label: 'Kalori (kcal)',
+                        data: cals,
+                        backgroundColor: '#10b981',
+                        borderRadius: 4,
+                    }]
+                },
+                water: {
+                    labels: last12Months.map(m => m.label),
+                    datasets: [{
+                        label: 'Air (ml)',
+                        data: water,
+                        borderColor: '#3b82f6',
+                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                    }]
+                }
+            };
+        }
+
+        // Weekly or Monthly (by days)
+        const daysCount = period === "weekly" ? 7 : 30;
+        const dateLabels = [...Array(daysCount)].map((_, i) => {
             const d = new Date();
-            d.setDate(d.getDate() - (6 - i));
+            d.setDate(d.getDate() - (daysCount - 1 - i));
             return d.toLocaleDateString('en-CA');
         });
 
-        const dailyCals = last7Days.map(date => {
-            const dayLogs = logs.foodLogs.filter((l: any) => new Date(l.date).toLocaleDateString('en-CA') === date);
-            return dayLogs.reduce((sum: number, l: any) => sum + (l.calories || 0), 0);
+        const dailyCals = dateLabels.map(date => {
+            return (logs.foodLogs || [])
+                .filter((l: any) => new Date(l.date).toLocaleDateString('en-CA') === date)
+                .reduce((sum: number, l: any) => sum + (l.calories || 0), 0);
         });
 
-        const dailyWater = last7Days.map(date => {
-            const dayLogs = logs.waterLogs.filter((l: any) => new Date(l.date).toLocaleDateString('en-CA') === date);
-            return dayLogs.reduce((sum: number, l: any) => sum + (l.amount || 0), 0);
+        const dailyWater = dateLabels.map(date => {
+            return (logs.waterLogs || [])
+                .filter((l: any) => new Date(l.date).toLocaleDateString('en-CA') === date)
+                .reduce((sum: number, l: any) => sum + (l.amount || 0), 0);
         });
 
         return {
             calories: {
-                labels: last7Days.map(d => d.split('-').slice(1).reverse().join('/')),
+                labels: dateLabels.map(d => d.split('-').slice(1).reverse().join('/')),
                 datasets: [{
                     label: 'Kalori (kcal)',
                     data: dailyCals,
                     backgroundColor: '#10b981',
-                    borderRadius: 8,
+                    borderRadius: period === "weekly" ? 8 : 2,
                 }]
             },
             water: {
-                labels: last7Days.map(d => d.split('-').slice(1).reverse().join('/')),
+                labels: dateLabels.map(d => d.split('-').slice(1).reverse().join('/')),
                 datasets: [{
                     label: 'Air (ml)',
                     data: dailyWater,
@@ -155,15 +222,15 @@ export default function HistorySummary() {
 
             <main className="max-w-4xl mx-auto p-6 space-y-8">
                 {/* Period Selector */}
-                <div className="flex p-1 bg-slate-100 rounded-2xl w-full max-w-sm mx-auto">
-                    {(["daily", "weekly"] as const).map((p) => (
+                <div className="flex p-1 bg-slate-100 rounded-2xl w-full">
+                    {(["daily", "weekly", "monthly", "yearly"] as const).map((p) => (
                         <button
                             key={p}
                             onClick={() => setPeriod(p)}
-                            className={`flex-1 py-2 text-sm font-bold rounded-xl transition-all capitalize ${period === p ? "bg-white text-emerald-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
+                            className={`flex-1 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all capitalize ${period === p ? "bg-white text-emerald-600 shadow-sm" : "text-slate-500 hover:text-slate-700"
                                 }`}
                         >
-                            {p === "daily" ? "Hari Ini" : "7 Hari Terakhir"}
+                            {p === "daily" ? "Harian" : p === "weekly" ? "7 Hari" : p === "monthly" ? "30 Hari" : "Tahunan"}
                         </button>
                     ))}
                 </div>
@@ -171,35 +238,33 @@ export default function HistorySummary() {
                 {/* Stats Grid */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <div className="glass p-6 rounded-3xl premium-shadow border-emerald-50 bg-white">
-                        <p className="text-slate-500 text-sm font-medium">
-                            {period === 'daily' ? 'Total Kalori Masuk' : 'Total Kalori (7 Hari)'}
-                        </p>
+                        <p className="text-slate-500 text-sm font-medium">Total Kalori</p>
                         <div className="text-3xl font-black text-slate-900 mt-1">
                             {summary?.totalCaloriesIn?.toLocaleString('id-ID') || 0} <span className="text-xs font-normal text-slate-400">kcal</span>
                         </div>
                         <p className="text-xs text-slate-400 mt-2">
-                            {period === 'daily' ? 'Bakar: ' : 'Rata-rata: '}
-                            {Math.round(summary?.totalCaloriesOut / (period === 'weekly' ? 7 : 1)) || 0} kcal
+                            {period === 'daily' ? 'Kalori Bakar (Olahraga): ' : 'Kalori Keluar: '}
+                            {summary?.totalCaloriesOut?.toLocaleString('id-ID') || 0} kcal
                         </p>
                     </div>
                     <div className="glass p-6 rounded-3xl premium-shadow border-blue-50 bg-white">
                         <p className="text-slate-500 text-sm font-medium">Asupan Air</p>
                         <div className="text-3xl font-black text-slate-900 mt-1">
-                            {(summary?.totalWater / 1000).toFixed(1)} <span className="text-xs font-normal text-slate-400">Liter</span>
+                            {((summary?.totalWater || 0) / 1000).toFixed(1)} <span className="text-xs font-normal text-slate-400">Liter</span>
                         </div>
                         <div className="text-blue-500 text-xs font-bold mt-2 flex items-center gap-1">
-                            <i className="lni lni-drop"></i> {summary?.totalWater || 0} ml
+                            <i className="lni lni-drop"></i> Total {summary?.totalWater || 0} ml
                         </div>
                     </div>
                     <div className="glass p-6 rounded-3xl premium-shadow border-orange-50 bg-white">
-                        <p className="text-slate-500 text-sm font-medium">Informasi Berat</p>
+                        <p className="text-slate-500 text-sm font-medium">Berat Badan</p>
                         <div className="text-3xl font-black text-slate-900 mt-1">
-                            {summary?.latestWeight || summary?.endWeight || "-"} <span className="text-xs font-normal text-slate-400">kg</span>
+                            {summary?.latestWeight || summary?.endWeight || user?.weight || "-"} <span className="text-xs font-normal text-slate-400">kg</span>
                         </div>
-                        {period === 'weekly' && summary?.startWeight && summary?.endWeight && (
+                        {summary?.startWeight && summary?.endWeight && (
                             <div className={`${summary.endWeight <= summary.startWeight ? 'text-emerald-500' : 'text-red-500'} text-xs font-bold mt-2 flex items-center gap-1`}>
                                 <i className={`lni ${summary.endWeight <= summary.startWeight ? 'lni-arrow-down' : 'lni-arrow-up'}`}></i>
-                                {Math.abs(summary.endWeight - summary.startWeight).toFixed(1)} kg perubahan
+                                {Math.abs(summary.endWeight - summary.startWeight).toFixed(1)} kg selisih
                             </div>
                         )}
                     </div>
@@ -209,7 +274,7 @@ export default function HistorySummary() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="glass p-6 rounded-3xl premium-shadow bg-white">
                         <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
-                            <i className="lni lni-fire text-emerald-500"></i> {period === 'daily' ? 'Ringkasan Kalori' : 'Tren Kalori'}
+                            <i className="lni lni-fire text-emerald-500"></i> Tren Kalori
                         </h3>
                         <div className="h-64">
                             <Bar data={charts.calories} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }} />
@@ -217,7 +282,7 @@ export default function HistorySummary() {
                     </div>
                     <div className="glass p-6 rounded-3xl premium-shadow bg-white">
                         <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
-                            <i className="lni lni-drop text-blue-500"></i> Tren Hidrasi
+                            <i className="lni lni-drop text-blue-500"></i> Tren Air
                         </h3>
                         <div className="h-64">
                             <Line data={charts.water} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }} />
@@ -225,38 +290,18 @@ export default function HistorySummary() {
                     </div>
                 </div>
 
-                {/* Detailed Logs (Food) */}
-                {period === 'daily' && logs?.foods?.length > 0 && (
-                    <div className="space-y-4">
-                        <h2 className="text-xl font-bold text-slate-900">Makanan Hari Ini</h2>
-                        <div className="space-y-3">
-                            {logs.foods.map((food: any) => (
-                                <div key={food._id} className="glass p-4 rounded-2xl flex items-center justify-between bg-white">
-                                    <div className="flex items-center gap-3">
-                                        <div className="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center">
-                                            <i className="lni lni-pizza"></i>
-                                        </div>
-                                        <div>
-                                            <h4 className="font-bold text-slate-800">{food.foodName}</h4>
-                                            <p className="text-xs text-slate-500">{food.mealTime} • {food.portion}</p>
-                                        </div>
-                                    </div>
-                                    <div className="text-right">
-                                        <span className="font-bold text-slate-900">{food.calories}</span>
-                                        <span className="text-xs text-slate-400 block">kcal</span>
-                                    </div>
-                                </div>
-                            ))}
-                        </div>
+                {/* Info Box */}
+                <div className="bg-emerald-600 rounded-3xl p-8 text-white premium-shadow relative overflow-hidden">
+                    <div className="absolute right-0 top-0 w-40 h-40 bg-white/10 rounded-full -mr-10 -mt-10 blur-2xl"></div>
+                    <div className="relative z-10">
+                        <h3 className="text-xl font-bold mb-2">Analisis Kesehatan</h3>
+                        <p className="opacity-90 text-sm leading-relaxed max-w-lg">
+                            {period === 'daily'
+                                ? "Laporan hari ini menunjukkan aktivitas asupan makanan dan air Anda secara mendalam. Pastikan untuk mencatat setiap makanan untuk presisi maksimal."
+                                : `Dalam periode ${period === 'weekly' ? '7 hari' : period === 'monthly' ? '30 hari' : 'setahun'}, Anda telah melacak progres secara konsisten. Pertahankan momentum ini untuk mencapai target kesehatan Anda.`}
+                        </p>
                     </div>
-                )}
-
-                {(!logs || (period === 'daily' && logs?.foods?.length === 0)) && (
-                    <div className="py-12 text-center text-slate-400 bg-white rounded-3xl border-2 border-dashed border-slate-100">
-                        <i className="lni lni-empty-file text-4xl mb-2"></i>
-                        <p>Tidak ada data untuk periode ini.</p>
-                    </div>
-                )}
+                </div>
             </main>
         </div>
     );

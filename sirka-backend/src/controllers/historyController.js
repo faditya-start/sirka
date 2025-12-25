@@ -70,7 +70,7 @@ export const getDailySummary = async (req, res) => {
 // Get weekly trend 
 export const getWeeklyTrend = async (req, res) => {
   try {
-    const { userId } = req.query;
+    const userId = req.user.id;
 
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
@@ -88,7 +88,7 @@ export const getWeeklyTrend = async (req, res) => {
     const weightLogs = await WeightProgress.find({
       user: userId,
       date: { $gte: sevenDaysAgo },
-    });
+    }).sort({ date: 1 });
 
     const waterLogs = await WaterLog.find({
       user: userId,
@@ -112,8 +112,8 @@ export const getWeeklyTrend = async (req, res) => {
         totalCaloriesOut,
         netCalories: totalCaloriesIn - totalCaloriesOut,
         totalWater,
-        startWeight: weightLogs[weightLogs.length - 1]?.weight || null,
-        endWeight: weightLogs[0]?.weight || null,
+        startWeight: weightLogs[0]?.weight || null,
+        endWeight: weightLogs[weightLogs.length - 1]?.weight || null,
       },
       logs: {
         foodLogs,
@@ -121,6 +121,72 @@ export const getWeeklyTrend = async (req, res) => {
         weightLogs,
         waterLogs,
       },
+    });
+  } catch (error) {
+    res.status(500).json({ status: "error", message: error.message });
+  }
+};
+
+// Get monthly trend
+export const getMonthlyTrend = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const thirtyDaysAgo = new Date();
+    thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+
+    const foodLogs = await FoodLog.find({ user: userId, date: { $gte: thirtyDaysAgo } });
+    const activityLogs = await ActivityLog.find({ user: userId, date: { $gte: thirtyDaysAgo } });
+    const weightLogs = await WeightProgress.find({ user: userId, date: { $gte: thirtyDaysAgo } }).sort({ date: 1 });
+    const waterLogs = await WaterLog.find({ user: userId, date: { $gte: thirtyDaysAgo } });
+
+    const totalCaloriesIn = foodLogs.reduce((sum, log) => sum + log.calories, 0);
+    const totalCaloriesOut = activityLogs.reduce((sum, log) => sum + log.caloriesBurned, 0);
+    const totalWater = waterLogs.reduce((sum, log) => sum + log.amount, 0);
+
+    res.json({
+      status: "success",
+      monthlySummary: {
+        totalCaloriesIn,
+        totalCaloriesOut,
+        netCalories: totalCaloriesIn - totalCaloriesOut,
+        totalWater,
+        startWeight: weightLogs[0]?.weight || null,
+        endWeight: weightLogs[weightLogs.length - 1]?.weight || null,
+      },
+      logs: { foodLogs, activityLogs, weightLogs, waterLogs }
+    });
+  } catch (error) {
+    res.status(500).json({ status: "error", message: error.message });
+  }
+};
+
+// Get yearly trend
+export const getYearlyTrend = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const oneYearAgo = new Date();
+    oneYearAgo.setDate(oneYearAgo.getDate() - 365);
+
+    const foodLogs = await FoodLog.find({ user: userId, date: { $gte: oneYearAgo } });
+    const activityLogs = await ActivityLog.find({ user: userId, date: { $gte: oneYearAgo } });
+    const weightLogs = await WeightProgress.find({ user: userId, date: { $gte: oneYearAgo } }).sort({ date: 1 });
+    const waterLogs = await WaterLog.find({ user: userId, date: { $gte: oneYearAgo } });
+
+    const totalCaloriesIn = foodLogs.reduce((sum, log) => sum + log.calories, 0);
+    const totalCaloriesOut = activityLogs.reduce((sum, log) => sum + log.caloriesBurned, 0);
+    const totalWater = waterLogs.reduce((sum, log) => sum + log.amount, 0);
+
+    res.json({
+      status: "success",
+      yearlySummary: {
+        totalCaloriesIn,
+        totalCaloriesOut,
+        netCalories: totalCaloriesIn - totalCaloriesOut,
+        totalWater,
+        startWeight: weightLogs[0]?.weight || null,
+        endWeight: weightLogs[weightLogs.length - 1]?.weight || null,
+      },
+      logs: { foodLogs, activityLogs, weightLogs, waterLogs }
     });
   } catch (error) {
     res.status(500).json({ status: "error", message: error.message });
