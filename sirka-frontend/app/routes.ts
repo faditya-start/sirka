@@ -7,4 +7,5 @@ export default [
     route("onboarding", "routes/onboarding.tsx"),
     route("food-log", "routes/food-log.tsx"),
     route("weight-progress", "routes/weight-progress.tsx"),
+    route("profile", "routes/profile.tsx"),
 ] satisfies RouteConfig;

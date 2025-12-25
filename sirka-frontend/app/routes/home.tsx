@@ -98,10 +98,17 @@ export default function Home() {
                       </div>
                       <span className="text-sm font-medium text-slate-600">{item}</span>
                     </Link>
+                  ) : item === 'Profil' ? (
+                    <Link key={item} to="/profile" className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-slate-50 hover:bg-white hover:shadow-md border border-transparent hover:border-slate-100 transition-all group">
+                      <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center text-xl group-hover:scale-110 transition-transform text-slate-600">
+                        <i className="lni lni-user-4"></i>
+                      </div>
+                      <span className="text-sm font-medium text-slate-600">{item}</span>
+                    </Link>
                   ) : (
                     <button key={item} className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-slate-50 hover:bg-white hover:shadow-md border border-transparent hover:border-slate-100 transition-all group">
                       <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center text-xl group-hover:scale-110 transition-transform text-slate-600">
-                        {item === 'Olahraga' ? <i className="lni lni-dumbbell-1"></i> : <i className="lni lni-user-4"></i>}
+                        <i className="lni lni-dumbbell-1"></i>
                       </div>
                       <span className="text-sm font-medium text-slate-600">{item}</span>
                     </button>
