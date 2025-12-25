@@ -14,7 +14,7 @@ export default function Home() {
       {/* Navigation */}
       <nav className="glass sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <span className="text-2xl">🥗</span>
+          <i className="lni lni-service-bell-1 text-emerald-600" style={{ fontSize: "1.5rem" }}></i>
           <span className="text-xl font-bold">SIRKA</span>
         </div>
 
@@ -50,7 +50,7 @@ export default function Home() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <div className="glass p-8 rounded-3xl premium-shadow border-emerald-100 bg-emerald-50/30">
                 <h2 className="text-lg font-bold text-emerald-900 mb-4 flex items-center gap-2">
-                  <span>🔥</span> Kalori Hari Ini
+                  <i className="lni lni-fire-alt"></i> Kalori Hari Ini
                 </h2>
                 <div className="flex items-baseline gap-2">
                   <span className="text-4xl font-extrabold text-emerald-600">0</span>
@@ -63,7 +63,7 @@ export default function Home() {
 
               <div className="glass p-8 rounded-3xl premium-shadow border-blue-100 bg-blue-50/30">
                 <h2 className="text-lg font-bold text-blue-900 mb-4 flex items-center gap-2">
-                  <span>💧</span> Air Minum
+                  <i className="lni lni-drop"></i> Air Minum
                 </h2>
                 <div className="flex items-baseline gap-2">
                   <span className="text-4xl font-extrabold text-blue-600">0</span>
@@ -84,16 +84,16 @@ export default function Home() {
               <h2 className="text-xl font-bold text-slate-900 mb-6">Akses Cepat</h2>
               <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                 <Link to="/food-log" className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-slate-50 hover:bg-white hover:shadow-md border border-transparent hover:border-slate-100 transition-all group">
-                  <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
-                    🍎
+                  <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center text-xl group-hover:scale-110 transition-transform text-emerald-600">
+                    <i className="lni lni-knife-fork-1"></i>
                   </div>
                   <span className="text-sm font-medium text-slate-600">Makan</span>
                 </Link>
 
                 {['Olahraga', 'Berat', 'Profil'].map((item) => (
                   <button key={item} className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-slate-50 hover:bg-white hover:shadow-md border border-transparent hover:border-slate-100 transition-all group">
-                    <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center text-xl group-hover:scale-110 transition-transform">
-                      {item === 'Olahraga' ? '🏃' : item === 'Berat' ? '⚖️' : '👤'}
+                    <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center text-xl group-hover:scale-110 transition-transform text-slate-600">
+                      {item === 'Olahraga' ? <i className="lni lni-dumbbell-1"></i> : item === 'Berat' ? <i className="lni lni-bar-chart-4"></i> : <i className="lni lni-user-4"></i>}
                     </div>
                     <span className="text-sm font-medium text-slate-600">{item}</span>
                   </button>
@@ -104,7 +104,7 @@ export default function Home() {
         ) : (
           <div className="text-center py-20">
             <div className="inline-flex items-center justify-center w-24 h-24 rounded-3xl premium-gradient text-white text-5xl mb-8 premium-shadow animate-bounce">
-              🥗
+              <i className="lni lni-service-bell-1 text-emerald-600" style={{ fontSize: "4rem" }}></i>
             </div>
             <h1 className="text-5xl font-extrabold text-slate-900 tracking-tight leading-tight">
               Kesehatanmu adalah <br />

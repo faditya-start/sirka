@@ -102,7 +102,7 @@ export default function FoodLog() {
             {/* Header */}
             <nav className="glass sticky top-0 z-50 px-6 py-4 flex items-center justify-between">
                 <Link to="/" className="flex items-center gap-2">
-                    <span className="text-xl">⬅️</span>
+                    <i className="lni lni-chevron-left font-bold text-slate-700"></i>
                     <span className="font-bold text-slate-700">Kembali</span>
                 </Link>
                 <h1 className="text-lg font-bold text-slate-900">Catatan Makanan</h1>
@@ -137,7 +137,7 @@ export default function FoodLog() {
                     <section key={mealType} className="space-y-4">
                         <div className="flex items-center justify-between">
                             <h2 className="text-lg font-bold text-slate-800 flex items-center gap-2">
-                                {mealType === "Pagi" ? "🍳" : mealType === "Siang" ? "🍱" : mealType === "Malam" ? "🍽️" : "🍪"}
+                                {mealType === "Pagi" ? <i className="lni lni-sun"></i> : mealType === "Siang" ? <i className="lni lni-restaurant"></i> : mealType === "Malam" ? <i className="lni lni-night"></i> : <i className="lni lni-coffee-cup"></i>}
                                 {mealType}
                             </h2>
                             <span className="text-sm font-medium text-slate-400">
@@ -160,7 +160,7 @@ export default function FoodLog() {
                                             onClick={() => openDeleteModal(log._id)}
                                             className="text-slate-300 hover:text-red-500 p-2 transition-colors opacity-0 group-hover:opacity-100"
                                         >
-                                            🗑️
+                                            <i className="lni lni-trash-can"></i>
                                         </button>
                                     </div>
                                 ))
@@ -179,7 +179,7 @@ export default function FoodLog() {
                 onClick={() => setShowAddModal(true)}
                 className="fixed bottom-8 right-8 w-16 h-16 rounded-full bg-emerald-600 text-white text-3xl shadow-xl hover:scale-110 active:scale-95 transition-all flex items-center justify-center"
             >
-                +
+                <i className="lni lni-plus"></i>
             </button>
 
             {/* Add Food Modal */}
@@ -188,7 +188,9 @@ export default function FoodLog() {
                     <div className="bg-white w-full max-w-lg rounded-t-[32px] sm:rounded-[32px] p-8 space-y-6 max-h-[90vh] overflow-y-auto">
                         <div className="flex items-center justify-between">
                             <h2 className="text-2xl font-bold text-slate-900">Tambah Makanan</h2>
-                            <button onClick={() => setShowAddModal(false)} className="text-slate-400 text-2xl">✕</button>
+                            <button onClick={() => setShowAddModal(false)} className="text-slate-400 text-2xl">
+                                <i className="lni lni-close"></i>
+                            </button>
                         </div>
 
                         <form onSubmit={handleAddFood} className="space-y-4">
@@ -271,7 +273,7 @@ export default function FoodLog() {
                 <div className="fixed inset-0 z-[110] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-6">
                     <div className="bg-white w-full max-w-sm rounded-3xl p-8 space-y-6 text-center premium-shadow">
                         <div className="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center text-4xl mx-auto">
-                            ⚠️
+                            <i className="lni lni-warning"></i>
                         </div>
                         <div>
                             <h2 className="text-2xl font-bold text-slate-900">Hapus Catatan?</h2>

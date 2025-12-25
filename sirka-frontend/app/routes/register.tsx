@@ -42,7 +42,7 @@ export default function Register() {
             <div className="w-full max-w-md">
                 <div className="text-center mb-10">
                     <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl premium-gradient text-white text-3xl mb-4 premium-shadow">
-                        🌱
+                        <i className="lni lni-pencil-1 text-4xl"></i>
                     </div>
                     <h1 className="text-3xl font-bold text-slate-900">Mulai Perjalananmu</h1>
                     <p className="text-slate-500 mt-2">Daftar sekarang untuk hidup lebih sehat</p>
