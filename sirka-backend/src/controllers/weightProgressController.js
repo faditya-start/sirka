@@ -42,7 +42,7 @@ export const addWeightProgress = async (req, res) => {
 
 export const getAllWeights = async (req, res) => {
   try {
-    const logs = await WeightProgress.find().populate("user", "name email");
+    const logs = await WeightProgress.find({ user: req.user.id }).sort({ date: 1 });
     res.json({ status: "success", data: logs });
   } catch (error) {
     res.status(500).json({ status: "error", message: error.message });

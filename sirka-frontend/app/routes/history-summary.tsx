@@ -74,7 +74,7 @@ export default function HistorySummary() {
     };
 
     const getChartData = () => {
-        if (!logs) return { calories: { labels: [], datasets: [] }, water: { labels: [], datasets: [] } };
+        if (!logs) return { calories: { labels: [], datasets: [] }, water: { labels: [], datasets: [] }, weight: { labels: [], datasets: [] } };
 
         if (period === "daily") {
             return {
@@ -95,6 +95,15 @@ export default function HistorySummary() {
                         borderColor: '#3b82f6',
                         backgroundColor: 'rgba(59, 130, 246, 0.1)',
                         fill: true,
+                    }]
+                },
+                weight: {
+                    labels: ["Saat Ini"],
+                    datasets: [{
+                        label: 'Berat (kg)',
+                        data: [summary?.latestWeight || user?.weight || 0],
+                        backgroundColor: '#f59e0b',
+                        borderRadius: 8,
                     }]
                 }
             };
@@ -181,6 +190,25 @@ export default function HistorySummary() {
                         fill: true,
                         tension: 0.4,
                     }]
+                },
+                weight: {
+                    labels: last12Months.map(m => m.label),
+                    datasets: [{
+                        label: 'Berat (kg)',
+                        data: last12Months.map(m => {
+                            const weights = (logs.weightLogs || [])
+                                .filter((l: any) => {
+                                    const d = new Date(l.date);
+                                    return d.getMonth() === m.month && d.getFullYear() === m.year;
+                                });
+                            return weights.length > 0 ? weights[weights.length - 1].weight : null;
+                        }),
+                        borderColor: '#f59e0b',
+                        backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                        fill: true,
+                        tension: 0.4,
+                        spanGaps: true
+                    }]
                 }
             };
         }
@@ -251,6 +279,22 @@ export default function HistorySummary() {
                     backgroundColor: 'rgba(59, 130, 246, 0.1)',
                     fill: true,
                     tension: 0.4,
+                }]
+            },
+            weight: {
+                labels: dateLabels.map(d => d.split('-').slice(1).reverse().join('/')),
+                datasets: [{
+                    label: 'Berat (kg)',
+                    data: dateLabels.map(date => {
+                        const entry = (logs.weightLogs || [])
+                            .find((l: any) => new Date(l.date).toLocaleDateString('en-CA') === date);
+                        return entry ? entry.weight : null;
+                    }),
+                    borderColor: '#f59e0b',
+                    backgroundColor: 'rgba(245, 158, 11, 0.1)',
+                    fill: true,
+                    tension: 0.4,
+                    spanGaps: true
                 }]
             }
         };
@@ -335,6 +379,14 @@ export default function HistorySummary() {
                         </h3>
                         <div className="h-64">
                             <Bar data={charts.calories as any} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'bottom' as const, labels: { boxWidth: 12, font: { size: 10 } } } } }} />
+                        </div>
+                    </div>
+                    <div className="glass p-6 rounded-3xl premium-shadow bg-white">
+                        <h3 className="text-lg font-bold text-slate-900 mb-6 flex items-center gap-2">
+                            <i className="lni lni-stats-up text-orange-500"></i> Tren Berat Badan
+                        </h3>
+                        <div className="h-64">
+                            <Line data={charts.weight as any} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: false } } }} />
                         </div>
                     </div>
                     <div className="glass p-6 rounded-3xl premium-shadow bg-white">

@@ -1,4 +1,5 @@
 import User from "../models/User.js";
+import WeightProgress from "../models/WeightProgress.js";
 import jwt from "jsonwebtoken";
 import { calculateBMI, calculateBMR, calculateDailyCalorieTarget } from "../utils/healthCalculations.js";
 
@@ -16,6 +17,16 @@ export const registerUser = async (req, res) => {
     }
 
     const user = await User.create({ name, email, password, age, weight, height, goal, gender, activityLevel });
+
+    // Create initial weight progress entry
+    if (weight) {
+      await WeightProgress.create({
+        user: user._id,
+        weight: weight,
+        date: new Date(),
+        note: "Pencatatan awal saat registrasi"
+      });
+    }
 
     res.status(201).json({
       status: "success",
@@ -97,6 +108,18 @@ export const updateUserProfile = async (req, res) => {
     const user = await User.findById(req.user.id);
     if (!user) {
       return res.status(404).json({ status: "error", message: "User tidak ditemukan" });
+    }
+
+    const { weight } = req.body;
+
+    // If weight is being updated, check if we should create a log
+    if (weight && weight !== user.weight) {
+      await WeightProgress.create({
+        user: user._id,
+        weight: weight,
+        date: new Date(),
+        note: "Perbaruan profil / Onboarding"
+      });
     }
 
     Object.assign(user, req.body);
