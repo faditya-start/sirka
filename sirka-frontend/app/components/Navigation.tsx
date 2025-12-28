@@ -10,7 +10,7 @@ export default function Navigation() {
     if (!isAuthenticated) return null;
 
     const navItems = [
-        { label: "Home", path: "/", icon: "lni-home-2" },
+        { label: "Beranda", path: "/", icon: "lni-home-2" },
         { label: "Makan", path: "/food-log", icon: "lni-knife-fork-1" },
         { label: "Olahraga", path: "/exercise", icon: "lni-dumbbell-1" },
         { label: "Laporan", path: "/history", icon: "lni-bar-chart-4" },
