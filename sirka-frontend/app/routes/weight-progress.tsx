@@ -14,6 +14,7 @@ import {
     Filler,
 } from "chart.js";
 import { Line } from "react-chartjs-2";
+import BottomModal from "../components/ui/BottomModal";
 
 ChartJS.register(
     CategoryScale,
@@ -238,38 +239,32 @@ export default function WeightProgress() {
                 <i className="lni lni-plus"></i>
             </button>
 
-            {/* Add Weight Modal */}
-            {showAddModal && (
-                <div className="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-sm flex items-end sm:items-center justify-center p-4">
-                    <div className="bg-white w-full max-w-sm rounded-3xl p-8 space-y-6 premium-shadow">
-                        <div className="flex items-center justify-between">
-                            <h2 className="text-xl font-bold text-slate-900">Catat Berat Baru</h2>
-                            <button onClick={() => setShowAddModal(false)} className="text-slate-400 text-2xl">
-                                <i className="lni lni-close"></i>
-                            </button>
-                        </div>
-
-                        <form onSubmit={handleAddWeight} className="space-y-6">
-                            <div className="relative">
-                                <input
-                                    type="number"
-                                    className="w-full text-center text-5xl font-bold text-slate-900 bg-transparent border-none focus:ring-0 placeholder-slate-200 p-0"
-                                    placeholder="00.0"
-                                    value={currentWeight}
-                                    onChange={(e) => setCurrentWeight(e.target.value)}
-                                    autoFocus
-                                    required
-                                />
-                                <p className="text-center text-slate-400 mt-2 font-medium">Kilogram (kg)</p>
-                            </div>
-
-                            <button type="submit" className="btn-primary w-full py-4 text-lg">
-                                Simpan Progress
-                            </button>
-                        </form>
+            {/* Add Weight Modal (Refactored) */}
+            <BottomModal
+                isOpen={showAddModal}
+                onClose={() => setShowAddModal(false)}
+                title="Catat Berat Baru"
+                maxWidthClass="max-w-sm"
+            >
+                <form onSubmit={handleAddWeight} className="space-y-6">
+                    <div className="relative">
+                        <input
+                            type="number"
+                            className="w-full text-center text-5xl font-bold text-slate-900 bg-transparent border-none focus:ring-0 placeholder-slate-200 p-0"
+                            placeholder="00.0"
+                            value={currentWeight}
+                            onChange={(e) => setCurrentWeight(e.target.value)}
+                            autoFocus
+                            required
+                        />
+                        <p className="text-center text-slate-400 mt-2 font-medium">Kilogram (kg)</p>
                     </div>
-                </div>
-            )}
+
+                    <button type="submit" className="btn-primary w-full py-4 text-lg">
+                        Simpan Progress
+                    </button>
+                </form>
+            </BottomModal>
         </div>
     );
 }

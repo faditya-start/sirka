@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { useNavigate, Link } from "react-router";
 import api from "../services/api";
 import { useAuthStore, type AuthState } from "../store/authStore";
+import BottomModal from "../components/ui/BottomModal";
 
 interface FoodEntry {
     _id: string;
@@ -194,93 +195,87 @@ export default function FoodLog() {
                 <i className="lni lni-plus"></i>
             </button>
 
-            {/* Add Food Modal */}
-            {showAddModal && (
-                <div className="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-sm flex items-end sm:items-center justify-center p-4">
-                    <div className="bg-white w-full max-w-lg rounded-t-[32px] sm:rounded-[32px] p-8 space-y-6 max-h-[90vh] overflow-y-auto">
-                        <div className="flex items-center justify-between">
-                            <h2 className="text-2xl font-bold text-slate-900">Tambah Makanan</h2>
-                            <button onClick={() => setShowAddModal(false)} className="text-slate-400 text-2xl">
-                                <i className="lni lni-close"></i>
-                            </button>
-                        </div>
-
-                        <form onSubmit={handleAddFood} className="space-y-4">
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-1">Nama Makanan</label>
-                                <input
-                                    type="text"
-                                    className="input-premium"
-                                    placeholder="Misal: Nasi Goreng"
-                                    value={formData.foodName}
-                                    onChange={e => setFormData({ ...formData, foodName: e.target.value })}
-                                    required
-                                />
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Kalori (kcal)</label>
-                                    <input
-                                        type="number"
-                                        className="input-premium"
-                                        placeholder="250"
-                                        value={formData.calories}
-                                        onChange={e => setFormData({ ...formData, calories: e.target.value })}
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-1">Waktu Makan</label>
-                                    <select
-                                        className="input-premium appearance-none"
-                                        value={formData.mealTime}
-                                        onChange={e => setFormData({ ...formData, mealTime: e.target.value as any })}
-                                    >
-                                        {meals.map(m => <option key={m} value={m}>{m}</option>)}
-                                    </select>
-                                </div>
-                            </div>
-
-                            <div className="grid grid-cols-3 gap-3">
-                                <div>
-                                    <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Protein (g)</label>
-                                    <input
-                                        type="number"
-                                        className="input-premium py-2 text-sm"
-                                        placeholder="0"
-                                        value={formData.protein}
-                                        onChange={e => setFormData({ ...formData, protein: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Karbo (g)</label>
-                                    <input
-                                        type="number"
-                                        className="input-premium py-2 text-sm"
-                                        placeholder="0"
-                                        value={formData.carbs}
-                                        onChange={e => setFormData({ ...formData, carbs: e.target.value })}
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Lemak (g)</label>
-                                    <input
-                                        type="number"
-                                        className="input-premium py-2 text-sm"
-                                        placeholder="0"
-                                        value={formData.fat}
-                                        onChange={e => setFormData({ ...formData, fat: e.target.value })}
-                                    />
-                                </div>
-                            </div>
-
-                            <button type="submit" className="btn-primary w-full py-4 mt-4">Simpan Catatan</button>
-                        </form>
+            {/* Add Food Modal (Refactored) */}
+            <BottomModal
+                isOpen={showAddModal}
+                onClose={() => setShowAddModal(false)}
+                title="Tambah Makanan"
+            >
+                <form onSubmit={handleAddFood} className="space-y-4">
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-1">Nama Makanan</label>
+                        <input
+                            type="text"
+                            className="input-premium"
+                            placeholder="Misal: Nasi Goreng"
+                            value={formData.foodName}
+                            onChange={e => setFormData({ ...formData, foodName: e.target.value })}
+                            required
+                        />
                     </div>
-                </div>
-            )}
-            {/* Confirmation Delete Modal */}
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Kalori (kcal)</label>
+                            <input
+                                type="number"
+                                className="input-premium"
+                                placeholder="250"
+                                value={formData.calories}
+                                onChange={e => setFormData({ ...formData, calories: e.target.value })}
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-1">Waktu Makan</label>
+                            <select
+                                className="input-premium appearance-none"
+                                value={formData.mealTime}
+                                onChange={e => setFormData({ ...formData, mealTime: e.target.value as any })}
+                            >
+                                {meals.map(m => <option key={m} value={m}>{m}</option>)}
+                            </select>
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-3">
+                        <div>
+                            <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Protein (g)</label>
+                            <input
+                                type="number"
+                                className="input-premium py-2 text-sm"
+                                placeholder="0"
+                                value={formData.protein}
+                                onChange={e => setFormData({ ...formData, protein: e.target.value })}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Karbo (g)</label>
+                            <input
+                                type="number"
+                                className="input-premium py-2 text-sm"
+                                placeholder="0"
+                                value={formData.carbs}
+                                onChange={e => setFormData({ ...formData, carbs: e.target.value })}
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Lemak (g)</label>
+                            <input
+                                type="number"
+                                className="input-premium py-2 text-sm"
+                                placeholder="0"
+                                value={formData.fat}
+                                onChange={e => setFormData({ ...formData, fat: e.target.value })}
+                            />
+                        </div>
+                    </div>
+
+                    <button type="submit" className="btn-primary w-full py-4 mt-4">Simpan Catatan</button>
+                </form>
+            </BottomModal>
+
+            {/* Confirmation Delete Modal - Keeping original for simplified boolean state flow, or could refactor to BottomModal too if desired, but centered alert is usually better for confirmation */}
             {showDeleteModal && (
                 <div className="fixed inset-0 z-[110] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-6">
                     <div className="bg-white w-full max-w-sm rounded-3xl p-8 space-y-6 text-center premium-shadow">

@@ -2,6 +2,7 @@ import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router";
 import api from "../services/api";
 import { useAuthStore, type AuthState } from "../store/authStore";
+import BottomModal from "../components/ui/BottomModal";
 
 interface ActivityEntry {
     _id: string;
@@ -187,85 +188,78 @@ export default function Exercise() {
                 <i className="lni lni-plus"></i>
             </button>
 
-            {/* Add Modal */}
-            {showAddModal && (
-                <div className="fixed inset-0 z-[100] bg-slate-900/40 backdrop-blur-sm flex items-end sm:items-center justify-center p-4">
-                    <div className="bg-white w-full max-w-lg rounded-t-[32px] sm:rounded-[32px] p-8 space-y-6 max-h-[90vh] overflow-y-auto premium-shadow">
-                        <div className="flex items-center justify-between">
-                            <h2 className="text-2xl font-bold text-slate-900">Tambah Aktivitas</h2>
-                            <button onClick={() => setShowAddModal(false)} className="text-slate-400 text-2xl">
-                                <i className="lni lni-close"></i>
-                            </button>
+            {/* Add Modal (Refactored) */}
+            <BottomModal
+                isOpen={showAddModal}
+                onClose={() => setShowAddModal(false)}
+                title="Tambah Aktivitas"
+            >
+                <form onSubmit={handleAddActivity} className="space-y-5">
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">Jenis Olahraga</label>
+                        <div className="grid grid-cols-2 gap-3">
+                            {activityTypes.map(type => (
+                                <button
+                                    key={type}
+                                    type="button"
+                                    onClick={() => setFormData({ ...formData, activityType: type as any })}
+                                    className={`p-3 rounded-xl border-2 text-sm font-bold transition-all flex items-center justify-center gap-2
+                                        ${formData.activityType === type
+                                            ? 'border-emerald-500 bg-emerald-50 text-emerald-600'
+                                            : 'border-slate-100 bg-white text-slate-500 hover:border-slate-200'}`}
+                                >
+                                    {type === 'Cardio' && <i className="lni lni-run"></i>}
+                                    {type === 'Strength' && <i className="lni lni-dumbbell"></i>}
+                                    {type === 'Flexibility' && <i className="lni lni-emoji-happy"></i>}
+                                    {type === 'Sport' && <i className="lni lni-basketball"></i>}
+                                    {type}
+                                </button>
+                            ))}
                         </div>
-
-                        <form onSubmit={handleAddActivity} className="space-y-5">
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">Jenis Olahraga</label>
-                                <div className="grid grid-cols-2 gap-3">
-                                    {activityTypes.map(type => (
-                                        <button
-                                            key={type}
-                                            type="button"
-                                            onClick={() => setFormData({ ...formData, activityType: type })}
-                                            className={`p-3 rounded-xl border-2 text-sm font-bold transition-all flex items-center justify-center gap-2
-                                                ${formData.activityType === type
-                                                    ? 'border-emerald-500 bg-emerald-50 text-emerald-600'
-                                                    : 'border-slate-100 bg-white text-slate-500 hover:border-slate-200'}`}
-                                        >
-                                            {type === 'Cardio' && <i className="lni lni-run"></i>}
-                                            {type === 'Strength' && <i className="lni lni-dumbbell"></i>}
-                                            {type === 'Flexibility' && <i className="lni lni-emoji-happy"></i>}
-                                            {type === 'Sport' && <i className="lni lni-basketball"></i>}
-                                            {type}
-                                        </button>
-                                    ))}
-                                </div>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-slate-700 mb-2">Nama Aktivitas</label>
-                                <input
-                                    type="text"
-                                    className="input-premium"
-                                    placeholder="Misal: Lari Pagi, Push Up"
-                                    value={formData.activityName}
-                                    onChange={e => setFormData({ ...formData, activityName: e.target.value })}
-                                    required
-                                />
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">Durasi (menit)</label>
-                                    <input
-                                        type="number"
-                                        className="input-premium"
-                                        placeholder="30"
-                                        value={formData.duration}
-                                        onChange={e => setFormData({ ...formData, duration: e.target.value })}
-                                        required
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-medium text-slate-700 mb-2">Kalori (kcal)</label>
-                                    <input
-                                        type="number"
-                                        className="input-premium"
-                                        placeholder="150"
-                                        value={formData.caloriesBurned}
-                                        onChange={e => setFormData({ ...formData, caloriesBurned: e.target.value })}
-                                        required
-                                    />
-                                </div>
-                            </div>
-
-                            <button type="submit" className="btn-primary w-full py-4 mt-2">
-                                Simpan Aktivitas
-                            </button>
-                        </form>
                     </div>
-                </div>
-            )}
+
+                    <div>
+                        <label className="block text-sm font-medium text-slate-700 mb-2">Nama Aktivitas</label>
+                        <input
+                            type="text"
+                            className="input-premium"
+                            placeholder="Misal: Lari Pagi, Push Up"
+                            value={formData.activityName}
+                            onChange={e => setFormData({ ...formData, activityName: e.target.value })}
+                            required
+                        />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Durasi (menit)</label>
+                            <input
+                                type="number"
+                                className="input-premium"
+                                placeholder="30"
+                                value={formData.duration}
+                                onChange={e => setFormData({ ...formData, duration: e.target.value })}
+                                required
+                            />
+                        </div>
+                        <div>
+                            <label className="block text-sm font-medium text-slate-700 mb-2">Kalori (kcal)</label>
+                            <input
+                                type="number"
+                                className="input-premium"
+                                placeholder="150"
+                                value={formData.caloriesBurned}
+                                onChange={e => setFormData({ ...formData, caloriesBurned: e.target.value })}
+                                required
+                            />
+                        </div>
+                    </div>
+
+                    <button type="submit" className="btn-primary w-full py-4 mt-2">
+                        Simpan Aktivitas
+                    </button>
+                </form>
+            </BottomModal>
 
             {/* Delete Modal */}
             {showDeleteModal && (
