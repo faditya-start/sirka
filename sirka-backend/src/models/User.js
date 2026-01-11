@@ -1,3 +1,7 @@
+/**
+ * ARCHITECTURE ROLE: User Model
+ * Representasi inti pengguna dalam sistem, menyimpan data profil dan kredensial.
+ */
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 
@@ -20,6 +24,9 @@ const userSchema = new mongoose.Schema(
   { timestamps: true }
 );
 
+/**
+ * Middleware Pre-save: Melakukan hashing password otomatis sebelum disimpan ke database
+ */
 userSchema.pre("save", async function (next) {
   if (!this.isModified("password")) return next();
   const salt = await bcrypt.genSalt(10);

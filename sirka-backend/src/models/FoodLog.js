@@ -1,3 +1,7 @@
+/**
+ * ARCHITECTURE ROLE: FoodLog Model
+ * Skema database untuk menyimpan data asupan makanan harian pengguna.
+ */
 import mongoose from "mongoose";
 
 const foodLogSchema = new mongoose.Schema(

@@ -1,3 +1,7 @@
+/**
+ * ARCHITECTURE ROLE: FoodLog Routes
+ * Definisi endpoint API untuk manajemen log makanan.
+ */
 import express from "express";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import {
@@ -9,6 +13,10 @@ import {
 } from "../controllers/foodLogController.js";
 
 const router = express.Router();
+
+// ==========================================
+// FOOD LOG ENDPOINTS
+// ==========================================
 
 router.post("/", authMiddleware, createFoodLog);
 router.get("/", authMiddleware, getAllFoodLogs);

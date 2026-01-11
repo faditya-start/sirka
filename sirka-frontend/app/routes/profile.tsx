@@ -3,7 +3,12 @@ import { Link, useNavigate } from "react-router";
 import api from "../services/api";
 import { useAuthStore, type AuthState } from "../store/authStore";
 
+/**
+ * Halaman Profil Pengguna
+ * Menangani tampilan informasi pengguna, pembaruan profil, dan proses logout.
+ */
 export default function Profile() {
+    // --- State & Hooks ---
     const { user, token, logout, updateUser } = useAuthStore((state: AuthState) => state);
     const navigate = useNavigate();
     const [loading, setLoading] = useState(false);
@@ -22,10 +27,13 @@ export default function Profile() {
         goal: "Maintain",
     });
 
+    // --- Effects ---
+    // Pastikan pengguna sudah login sebelum mengakses halaman ini
     useEffect(() => {
         if (!token) {
             navigate("/login");
         } else if (user) {
+            // Sinkronisasi data form dengan data user terbaru dari store
             setFormData({
                 name: user.name || "",
                 email: user.email || "",
@@ -49,6 +57,9 @@ export default function Profile() {
         }));
     };
 
+    /**
+     * Menangani submit form untuk update profil
+     */
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         setLoading(true);
@@ -56,7 +67,7 @@ export default function Profile() {
 
         try {
             const response = await api.put("/users/profile", formData);
-            updateUser(response.data.data);
+            updateUser(response.data.data); // Update global auth store
             setMessage({ type: "success", text: "Profil berhasil diperbarui!" });
             setIsEditing(false);
         } catch (err: any) {

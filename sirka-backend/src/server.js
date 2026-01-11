@@ -1,7 +1,12 @@
+// ==========================================
+// SIRKA BACKEND SERVER CONFIGURATION
+// ==========================================
 import express from "express";
 import dotenv from "dotenv";
 import cors from "cors";
 import connectDB from "./config/db.js";
+
+// Import Routes
 import userRoutes from "./routes/userRoutes.js";
 import foodLogRoutes from "./routes/foodLogRoutes.js";
 import activityLogRoutes from "./routes/activityLogRoutes.js";
@@ -10,14 +15,19 @@ import weightProgressRoutes from "./routes/weightProgressRoutes.js";
 import historyRoutes from "./routes/historyRoutes.js";
 import waterLogRoutes from "./routes/waterLogRoutes.js";
 
+// Load Environment Variables
 dotenv.config();
+
+// Connect to MongoDB
 connectDB();
 
 const app = express();
-app.use(cors());
-app.use(express.json());
 
-// Routes
+// Middleware
+app.use(cors()); // Enable Cross-Origin Resource Sharing
+app.use(express.json()); // Body parser for JSON data
+
+// API Routes Definition
 app.use("/api/users", userRoutes);
 app.use("/api/foodlogs", foodLogRoutes);
 app.use("/api/activitylogs", activityLogRoutes);
@@ -26,9 +36,15 @@ app.use("/api/weightprogress", weightProgressRoutes);
 app.use("/api/history", historyRoutes);
 app.use("/api/waterlogs", waterLogRoutes);
 
+// Root Endpoint for Health Check
 app.get("/", (req, res) => {
   res.send("Sirka Backend server is running");
 });
 
+// Start Server
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+  console.log(`Environment: ${process.env.NODE_ENV || 'development'}`);
+});
+

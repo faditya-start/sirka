@@ -1,6 +1,13 @@
+/**
+ * ARCHITECTURE ROLE: FoodLog Controller
+ * Menangani logika CRUD untuk pencatatan makanan pengguna.
+ */
 import FoodLog from "../models/FoodLog.js";
 import User from "../models/User.js";
 
+/**
+ * Membuat catatan makanan baru
+ */
 export const createFoodLog = async (req, res) => {
   try {
     const userId = req.user.id;
@@ -33,6 +40,9 @@ export const createFoodLog = async (req, res) => {
   }
 };
 
+/**
+ * Mengambil semua catatan makanan milik user yang sedang login
+ */
 export const getFoodLogsByUser = async (req, res) => {
   try {
     const logs = await FoodLog.find({ user: req.user.id }).sort({ date: -1 });

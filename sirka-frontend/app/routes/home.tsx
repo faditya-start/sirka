@@ -1,12 +1,18 @@
+/**
+ * ARCHITECTURE ROLE: Home Route (Dashboard)
+ * Halaman utama yang menampilkan ringkasan aktivitas harian pengguna.
+ */
 import { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router";
 import { useAuthStore } from "../store/authStore";
 import api from "../services/api";
 
 export default function Home() {
+  // --- Global State & Hooks ---
   const { isAuthenticated, user, logout } = useAuthStore();
   const navigate = useNavigate();
 
+  // --- Local Dashboard State ---
   const [todayCalories, setTodayCalories] = useState(0);
   const [burnedCalories, setBurnedCalories] = useState(0);
   const [todayWater, setTodayWater] = useState(0);
@@ -19,12 +25,17 @@ export default function Home() {
 
   const waterGoal = 2500;
 
+  // --- Effects ---
   useEffect(() => {
     if (isAuthenticated) {
       fetchDashboardData();
     }
   }, [isAuthenticated]);
 
+  /**
+   * Mengambil data harian dari berbagai source API (Food, Water, Activity)
+   * dan melakukan kalkulasi total untuk ditampilkan di dashboard.
+   */
   const fetchDashboardData = async () => {
     try {
       const todayShort = new Date().toLocaleDateString('en-CA'); // YYYY-MM-DD

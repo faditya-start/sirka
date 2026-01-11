@@ -1,3 +1,7 @@
+/**
+ * ARCHITECTURE ROLE: User Controller
+ * Mengelola pendaftaran, otentikasi, dan manipulasi profil data pengguna.
+ */
 import User from "../models/User.js";
 import WeightProgress from "../models/WeightProgress.js";
 import jwt from "jsonwebtoken";
@@ -7,6 +11,9 @@ const generateToken = (id) => {
   return jwt.sign({ id }, process.env.JWT_SECRET, { expiresIn: "7d" });
 };
 
+/**
+ * Mendaftarkan pengguna baru dan membuat log berat badan awal
+ */
 export const registerUser = async (req, res) => {
   try {
     const { name, email, password, age, weight, height, goal, gender, activityLevel } = req.body;
@@ -43,6 +50,9 @@ export const registerUser = async (req, res) => {
   }
 };
 
+/**
+ * Melakukan verifikasi kredensial pengguna dan mengembalikan token JWT
+ */
 export const loginUser = async (req, res) => {
   try {
     const { email, password } = req.body;
