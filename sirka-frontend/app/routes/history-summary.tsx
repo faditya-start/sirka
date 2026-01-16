@@ -16,7 +16,7 @@ import {
 import { Bar, Line } from "react-chartjs-2";
 import StatsCard from "../components/ui/StatsCard";
 import ChartCard from "../components/ui/ChartCard";
-import { useHistoryData, Period } from "../hooks/useHistoryData";
+import { useHistoryData, type Period } from "../hooks/useHistoryData";
 
 ChartJS.register(
     CategoryScale,
@@ -82,26 +82,7 @@ export default function HistorySummary() {
                     ))}
                 </div>
 
-                {/* Stats Grid */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    <StatsCard
-                        title="Kalori (Asupan vs Bakar)"
-                        value={`${summary?.totalCaloriesIn?.toLocaleString('id-ID') || 0} vs ${summary?.totalCaloriesOut?.toLocaleString('id-ID') || 0}`}
-                        subtitle={`Netto: ${summary?.netCalories?.toLocaleString('id-ID') || 0} kcal`}
-                        icon="lni lni-calculator"
-                        colorClass="border-emerald-50 bg-white"
-                        className={summary?.netCalories <= 0 ? "text-emerald-500" : "text-orange-500"} // This might need adjustment based on how StatsCard handles text color for subtitle
-                    />
-                    {/* 
-                       Note: StatsCard implementation assumes subtitle is just text/node. 
-                       I might need to tweak StatsCard or pass the color logic specifically.
-                       In StatsCard.tsx I didn't verify the subtitle color logic deeply.
-                       Let's look at StatsCard again. It wraps subtitle in a div with className.
-                       I can pass the subtitle as a ReactNode with the color class embedded.
-                     */}
 
-                    {/* Re-rendering StatsCards with specific content nodes for subtitles to retain full control over styling if needed, or pass simple props. */}
-                </div>
 
                 {/* 
                    Wait, I should rewrite the above StatsCard usage to be more precise.
@@ -114,7 +95,7 @@ export default function HistorySummary() {
                         unit={`vs ${summary?.totalCaloriesOut?.toLocaleString('id-ID') || 0}`}
                         colorClass="border-emerald-50"
                         subtitle={
-                            <span className={summary?.netCalories <= 0 ? 'text-emerald-500' : 'text-orange-500'}>
+                            <span className={(summary?.netCalories || 0) <= 0 ? 'text-emerald-500' : 'text-orange-500'}>
                                 Netto: {summary?.netCalories?.toLocaleString('id-ID') || 0} kcal
                             </span>
                         }
@@ -141,8 +122,8 @@ export default function HistorySummary() {
                         colorClass="border-orange-50"
                         subtitle={
                             summary?.startWeight && summary?.endWeight ? (
-                                <span className={`${summary.endWeight <= summary.startWeight ? 'text-emerald-500' : 'text-red-500'}`}>
-                                    {Math.abs(summary.endWeight - summary.startWeight).toFixed(1)} kg selisih
+                                <span className={`${(summary?.endWeight || 0) <= (summary?.startWeight || 0) ? 'text-emerald-500' : 'text-red-500'}`}>
+                                    {Math.abs((summary?.endWeight || 0) - (summary?.startWeight || 0)).toFixed(1)} kg selisih
                                 </span>
                             ) : null
                         }
@@ -157,7 +138,7 @@ export default function HistorySummary() {
                         icon="lni lni-fire"
                         iconColorClass="text-emerald-500"
                     >
-                        <Bar data={charts.calories as any} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'bottom' as const, labels: { boxWidth: 12, font: { size: 10 } } } } }} />
+                        <Bar data={charts.calories as any} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: true, position: 'bottom' as const, labels: { boxWidth: 12, font: { size: 10 } } } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { grid: { display: false } } } }} />
                     </ChartCard>
 
                     <ChartCard
@@ -165,7 +146,7 @@ export default function HistorySummary() {
                         icon="lni lni-stats-up"
                         iconColorClass="text-orange-500"
                     >
-                        <Line data={charts.weight as any} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: false } } }} />
+                        <Line data={charts.weight as any} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: false, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { grid: { display: false } } } }} />
                     </ChartCard>
 
                     <ChartCard
@@ -173,7 +154,7 @@ export default function HistorySummary() {
                         icon="lni lni-drop"
                         iconColorClass="text-blue-500"
                     >
-                        <Line data={charts.water} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } } }} />
+                        <Line data={charts.water as any} options={{ responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false } }, scales: { y: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } }, x: { grid: { display: false } } } }} />
                     </ChartCard>
                 </div>
 

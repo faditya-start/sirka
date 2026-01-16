@@ -4,10 +4,45 @@ import { type AuthState } from "../store/authStore";
 
 export type Period = "daily" | "weekly" | "monthly" | "yearly";
 
+export interface HistorySummaryData {
+    totalCaloriesIn: number;
+    totalCaloriesOut: number;
+    netCalories: number;
+    totalWater: number;
+    latestWeight?: number;
+    startWeight?: number;
+    endWeight?: number;
+}
+
+export interface ChartDataset {
+    label: string;
+    data: (number | null)[];
+    backgroundColor?: string | string[];
+    borderColor?: string;
+    borderRadius?: number;
+    fill?: boolean;
+    type?: 'line' | 'bar';
+    borderWidth?: number;
+    pointRadius?: number;
+    tension?: number;
+    spanGaps?: boolean;
+}
+
+export interface ChartData {
+    labels: string[];
+    datasets: ChartDataset[];
+}
+
+export interface HistoryCharts {
+    calories: ChartData;
+    water: ChartData;
+    weight: ChartData;
+}
+
 export function useHistoryData(user: AuthState['user'], period: Period) {
     const [loading, setLoading] = useState(true);
-    const [summary, setSummary] = useState<any>(null);
-    const [logs, setLogs] = useState<any>(null);
+    const [summary, setSummary] = useState<HistorySummaryData | null>(null);
+    const [logs, setLogs] = useState<any>(null); // Keeping logs as any for now due to complex nested structure variants
 
     const fetchHistoryData = useCallback(async () => {
         setLoading(true);
@@ -42,7 +77,7 @@ export function useHistoryData(user: AuthState['user'], period: Period) {
         fetchHistoryData();
     }, [fetchHistoryData]);
 
-    const getChartData = () => {
+    const getChartData = (): HistoryCharts => {
         if (!logs) return { calories: { labels: [], datasets: [] }, water: { labels: [], datasets: [] }, weight: { labels: [], datasets: [] } };
 
         if (period === "daily") {
