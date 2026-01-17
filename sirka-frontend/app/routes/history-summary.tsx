@@ -81,13 +81,6 @@ export default function HistorySummary() {
                         </button>
                     ))}
                 </div>
-
-
-
-                {/* 
-                   Wait, I should rewrite the above StatsCard usage to be more precise.
-                   The original code had specific logic for colors.
-                */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     <StatsCard
                         title="Kalori (Asupan vs Bakar)"
