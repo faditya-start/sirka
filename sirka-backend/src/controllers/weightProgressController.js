@@ -1,6 +1,13 @@
+/**
+ * ARCHITECTURE ROLE: WeightProgress Controller
+ * Menangani logika pencatatan dan pemantauan progres berat badan pengguna.
+ */
 import WeightProgress from "../models/WeightProgress.js";
 import User from "../models/User.js";
 
+/**
+ * Menambah catatan berat badan baru dan memperbarui profil user
+ */
 export const addWeightProgress = async (req, res) => {
   try {
     const { weight, date, note } = req.body;

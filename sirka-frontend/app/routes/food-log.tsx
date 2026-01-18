@@ -16,14 +16,21 @@ interface FoodEntry {
     date: string;
 }
 
+/**
+ * ARCHITECTURE ROLE: FoodLog Page
+ * Halaman utama untuk mencatat dan melihat riwayat makanan harian.
+ */
 export default function FoodLog() {
     const { isAuthenticated } = useAuthStore((state: AuthState) => state);
     const navigate = useNavigate();
+    // --- State Management ---
     const [logs, setLogs] = useState<FoodEntry[]>([]);
     const [loading, setLoading] = useState(true);
     const [showAddModal, setShowAddModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [selectedLogId, setSelectedLogId] = useState<string | null>(null);
+
+    // Form State
     const [formData, setFormData] = useState({
         foodName: "",
         calories: "",

@@ -1,3 +1,9 @@
+/**
+ * Menghitung Body Mass Index (BMI)
+ * @param {number} weight - Berat badan dalam kg
+ * @param {number} height - Tinggi badan dalam cm
+ * @returns {Object} Objek berisi nilai BMI dan kategorinya
+ */
 export const calculateBMI = (weight, height) => {
     if (!weight || !height) return null;
     const heightInMeters = height / 100;
@@ -15,6 +21,10 @@ export const calculateBMI = (weight, height) => {
     };
 };
 
+/**
+ * Menghitung Basal Metabolic Rate (BMR) menggunakan rumus Mifflin-St Jeor
+ * @returns {number} Kalori yang dibakar tubuh dalam keadaan istirahat total
+ */
 export const calculateBMR = (weight, height, age, gender) => {
     if (!weight || !height || !age || !gender) return null;
 

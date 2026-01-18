@@ -1,5 +1,11 @@
+/**
+ * ARCHITECTURE ROLE: API Service
+ * Konfigurasi utama Axios untuk komunikasi dengan Backend.
+ * Menangani base URL dan interceptor token otentikasi.
+ */
 import axios from "axios";
 
+// Create Axios Instance
 const api = axios.create({
     baseURL: "/api",
     headers: {

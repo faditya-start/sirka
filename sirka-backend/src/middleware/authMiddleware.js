@@ -1,3 +1,8 @@
+/**
+ * ARCHITECTURE ROLE: Auth Middleware
+ * Memverifikasi validitas JSON Web Token (JWT) pada setiap request yang diproteksi.
+ * Jika valid, data user akan ditempelkan ke objek `req`.
+ */
 import jwt from "jsonwebtoken";
 import User from "../models/User.js";
 

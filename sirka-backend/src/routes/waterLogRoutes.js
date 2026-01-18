@@ -1,3 +1,7 @@
+/**
+ * ARCHITECTURE ROLE: WaterLog Routes
+ * Definisi endpoint API untuk manajemen log konsumsi air.
+ */
 import express from "express";
 import { authMiddleware } from "../middleware/authMiddleware.js";
 import {
@@ -9,6 +13,10 @@ import {
 } from "../controllers/waterLogController.js";
 
 const router = express.Router();
+
+// ==========================================
+// WATER LOG ENDPOINTS
+// ==========================================
 
 // Semua route memerlukan token auth
 router.use(authMiddleware);
