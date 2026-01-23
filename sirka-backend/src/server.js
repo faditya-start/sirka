@@ -25,7 +25,7 @@ const app = express();
 
 // Middleware
 app.use(cors()); // Enable Cross-Origin Resource Sharing
-app.use(express.json()); // Body parser for JSON data
+app.use(express.json());
 
 // API Routes Definition
 app.use("/api/users", userRoutes);
