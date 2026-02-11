@@ -4,6 +4,7 @@
  */
 import FoodLog from "../models/FoodLog.js";
 import User from "../models/User.js";
+import { getCache, setCache, clearCachePattern } from "../utils/cache.js";
 
 /**
  * Membuat catatan makanan baru
@@ -30,6 +31,13 @@ export const createFoodLog = async (req, res) => {
       date,
     });
 
+    // Invalidate cache
+    clearCachePattern(`foodlogs:user:${userId}`);
+    clearCachePattern(`history:daily:${userId}`);
+    clearCachePattern(`history:weekly:${userId}`);
+    clearCachePattern(`history:monthly:${userId}`);
+    clearCachePattern(`history:yearly:${userId}`);
+
     res.status(201).json({
       status: "success",
       message: "Log makanan berhasil dibuat",
@@ -45,7 +53,23 @@ export const createFoodLog = async (req, res) => {
  */
 export const getFoodLogsByUser = async (req, res) => {
   try {
-    const logs = await FoodLog.find({ user: req.user.id }).sort({ date: -1 });
+    const userId = req.user.id;
+    const cacheKey = `foodlogs:user:${userId}`;
+
+    const cachedData = getCache(cacheKey);
+    if (cachedData) {
+      return res.json({
+        status: "success",
+        message: "Daftar log makanan user (from cache)",
+        count: cachedData.length,
+        data: cachedData,
+      });
+    }
+
+    const logs = await FoodLog.find({ user: userId }).sort({ date: -1 });
+
+    // Set cache
+    setCache(cacheKey, logs);
 
     res.json({
       status: "success",
@@ -91,6 +115,14 @@ export const updateFoodLog = async (req, res) => {
     Object.assign(log, req.body);
     await log.save();
 
+    // Invalidate cache
+    const userId = req.user.id;
+    clearCachePattern(`foodlogs:user:${userId}`);
+    clearCachePattern(`history:daily:${userId}`);
+    clearCachePattern(`history:weekly:${userId}`);
+    clearCachePattern(`history:monthly:${userId}`);
+    clearCachePattern(`history:yearly:${userId}`);
+
     res.json({
       status: "success",
       message: "Log berhasil diperbarui",
@@ -116,6 +148,14 @@ export const deleteFoodLog = async (req, res) => {
     }
 
     await log.deleteOne();
+
+    // Invalidate cache
+    const userId = req.user.id;
+    clearCachePattern(`foodlogs:user:${userId}`);
+    clearCachePattern(`history:daily:${userId}`);
+    clearCachePattern(`history:weekly:${userId}`);
+    clearCachePattern(`history:monthly:${userId}`);
+    clearCachePattern(`history:yearly:${userId}`);
 
     res.json({
       status: "success",

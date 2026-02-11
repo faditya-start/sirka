@@ -4,6 +4,7 @@
  */
 import WeightProgress from "../models/WeightProgress.js";
 import User from "../models/User.js";
+import { getCache, setCache, clearCachePattern } from "../utils/cache.js";
 
 /**
  * Menambah catatan berat badan baru dan memperbarui profil user
@@ -30,6 +31,14 @@ export const addWeightProgress = async (req, res) => {
     user.weight = weight;
     await user.save();
 
+    // Invalidate cache
+    clearCachePattern(`weight:user:${userId}`);
+    clearCachePattern(`weight:all:user:${userId}`);
+    clearCachePattern(`history:daily:${userId}`);
+    clearCachePattern(`history:weekly:${userId}`);
+    clearCachePattern(`history:monthly:${userId}`);
+    clearCachePattern(`history:yearly:${userId}`);
+
     // Calculate current BMI
     const heightInMeters = user.height / 100;
     const bmi = user.height ? (weight / (heightInMeters * heightInMeters)).toFixed(1) : null;
@@ -49,7 +58,18 @@ export const addWeightProgress = async (req, res) => {
 
 export const getAllWeights = async (req, res) => {
   try {
-    const logs = await WeightProgress.find({ user: req.user.id }).sort({ date: 1 });
+    const userId = req.user.id;
+    const cacheKey = `weight:all:user:${userId}`;
+
+    const cachedData = getCache(cacheKey);
+    if (cachedData) {
+      return res.json({ status: "success", message: "from cache", data: cachedData });
+    }
+
+    const logs = await WeightProgress.find({ user: userId }).sort({ date: 1 });
+
+    setCache(cacheKey, logs);
+
     res.json({ status: "success", data: logs });
   } catch (error) {
     res.status(500).json({ status: "error", message: error.message });
@@ -66,8 +86,17 @@ export const getWeightsByUser = async (req, res) => {
     }
 
     const userId = requestedUserId || authUserId;
+    const cacheKey = `weight:user:${userId}`;
+
+    const cachedData = getCache(cacheKey);
+    if (cachedData) {
+      return res.json({ status: "success", message: "from cache", data: cachedData });
+    }
 
     const logs = await WeightProgress.find({ user: userId }).sort({ date: -1 });
+
+    setCache(cacheKey, logs);
+
     res.json({ status: "success", data: logs });
   } catch (error) {
     res.status(500).json({ status: "error", message: error.message });
@@ -88,6 +117,15 @@ export const updateWeightProgress = async (req, res) => {
     Object.assign(log, req.body);
     await log.save();
 
+    // Invalidate cache
+    const userId = req.user.id;
+    clearCachePattern(`weight:user:${userId}`);
+    clearCachePattern(`weight:all:user:${userId}`);
+    clearCachePattern(`history:daily:${userId}`);
+    clearCachePattern(`history:weekly:${userId}`);
+    clearCachePattern(`history:monthly:${userId}`);
+    clearCachePattern(`history:yearly:${userId}`);
+
     res.json({ status: "success", message: "Data berat badan diperbarui", data: log });
   } catch (error) {
     res.status(500).json({ status: "error", message: error.message });
@@ -106,6 +144,11 @@ export const deleteWeightProgress = async (req, res) => {
     }
 
     await log.deleteOne();
+
+    // Invalidate cache
+    clearCachePattern(`weight:user:${req.user.id}`);
+    clearCachePattern(`weight:all:user:${req.user.id}`);
+
     res.json({ status: "success", message: "Data berat badan dihapus" });
   } catch (error) {
     res.status(500).json({ status: "error", message: error.message });

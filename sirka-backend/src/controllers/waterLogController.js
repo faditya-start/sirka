@@ -1,5 +1,6 @@
 import WaterLog from "../models/WaterLog.js";
 import User from "../models/User.js";
+import { getCache, setCache, clearCachePattern } from "../utils/cache.js";
 
 export const createWaterLog = async (req, res) => {
     try {
@@ -17,6 +18,13 @@ export const createWaterLog = async (req, res) => {
             date,
         });
 
+        // Invalidate cache
+        clearCachePattern(`waterlogs:user:${userId}`);
+        clearCachePattern(`history:daily:${userId}`);
+        clearCachePattern(`history:weekly:${userId}`);
+        clearCachePattern(`history:monthly:${userId}`);
+        clearCachePattern(`history:yearly:${userId}`);
+
         res.status(201).json({
             status: "success",
             message: "Log air berhasil dibuat",
@@ -29,7 +37,23 @@ export const createWaterLog = async (req, res) => {
 
 export const getWaterLogsByUser = async (req, res) => {
     try {
-        const logs = await WaterLog.find({ user: req.user.id }).sort({ date: -1 });
+        const userId = req.user.id;
+        const cacheKey = `waterlogs:user:${userId}`;
+
+        const cachedData = getCache(cacheKey);
+        if (cachedData) {
+            return res.json({
+                status: "success",
+                message: "Daftar log air user (from cache)",
+                count: cachedData.length,
+                data: cachedData,
+            });
+        }
+
+        const logs = await WaterLog.find({ user: userId }).sort({ date: -1 });
+
+        // Set cache
+        setCache(cacheKey, logs);
 
         res.json({
             status: "success",
@@ -75,6 +99,14 @@ export const updateWaterLog = async (req, res) => {
         Object.assign(log, req.body);
         await log.save();
 
+        // Invalidate cache
+        const userId = req.user.id;
+        clearCachePattern(`waterlogs:user:${userId}`);
+        clearCachePattern(`history:daily:${userId}`);
+        clearCachePattern(`history:weekly:${userId}`);
+        clearCachePattern(`history:monthly:${userId}`);
+        clearCachePattern(`history:yearly:${userId}`);
+
         res.json({
             status: "success",
             message: "Log air berhasil diperbarui",
@@ -101,6 +133,14 @@ export const deleteWaterLog = async (req, res) => {
         }
 
         await log.deleteOne();
+
+        // Invalidate cache
+        const userId = req.user.id;
+        clearCachePattern(`waterlogs:user:${userId}`);
+        clearCachePattern(`history:daily:${userId}`);
+        clearCachePattern(`history:weekly:${userId}`);
+        clearCachePattern(`history:monthly:${userId}`);
+        clearCachePattern(`history:yearly:${userId}`);
 
         res.json({
             status: "success",

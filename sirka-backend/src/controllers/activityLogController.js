@@ -1,5 +1,6 @@
 import ActivityLog from "../models/ActivityLog.js";
 import User from "../models/User.js";
+import { getCache, setCache, clearCachePattern } from "../utils/cache.js";
 
 export const createActivityLog = async (req, res) => {
   try {
@@ -20,6 +21,13 @@ export const createActivityLog = async (req, res) => {
       caloriesBurned,
       date,
     });
+
+    // Invalidate cache
+    clearCachePattern(`activities:user:${userId}`);
+    clearCachePattern(`history:daily:${userId}`);
+    clearCachePattern(`history:weekly:${userId}`);
+    clearCachePattern(`history:monthly:${userId}`);
+    clearCachePattern(`history:yearly:${userId}`);
 
     res.status(201).json({
       status: "success",
@@ -50,8 +58,18 @@ export const getActivitiesByUser = async (req, res) => {
     }
 
     const userId = requestedUserId || authUserId;
+    const cacheKey = `activities:user:${userId}`;
+
+    const cachedData = getCache(cacheKey);
+    if (cachedData) {
+      return res.json({ status: "success", message: "from cache", data: cachedData });
+    }
 
     const logs = await ActivityLog.find({ user: userId }).sort({ date: -1 });
+
+    // Set cache
+    setCache(cacheKey, logs);
+
     res.json({ status: "success", data: logs });
   } catch (error) {
     res.status(500).json({ status: "error", message: error.message });
@@ -72,6 +90,14 @@ export const updateActivityLog = async (req, res) => {
     Object.assign(log, req.body);
     await log.save();
 
+    // Invalidate cache
+    const userId = req.user.id;
+    clearCachePattern(`activities:user:${userId}`);
+    clearCachePattern(`history:daily:${userId}`);
+    clearCachePattern(`history:weekly:${userId}`);
+    clearCachePattern(`history:monthly:${userId}`);
+    clearCachePattern(`history:yearly:${userId}`);
+
     res.json({ status: "success", message: "Aktivitas diperbarui", data: log });
   } catch (error) {
     res.status(500).json({ status: "error", message: error.message });
@@ -90,6 +116,15 @@ export const deleteActivityLog = async (req, res) => {
     }
 
     await log.deleteOne();
+
+    // Invalidate cache
+    const userId = req.user.id;
+    clearCachePattern(`activities:user:${userId}`);
+    clearCachePattern(`history:daily:${userId}`);
+    clearCachePattern(`history:weekly:${userId}`);
+    clearCachePattern(`history:monthly:${userId}`);
+    clearCachePattern(`history:yearly:${userId}`);
+
     res.json({ status: "success", message: "Aktivitas dihapus" });
   } catch (error) {
     res.status(500).json({ status: "error", message: error.message });

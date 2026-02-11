@@ -2,14 +2,21 @@ import FoodLog from "../models/FoodLog.js";
 import ActivityLog from "../models/ActivityLog.js";
 import WeightProgress from "../models/WeightProgress.js";
 import WaterLog from "../models/WaterLog.js";
+import { getCache, setCache } from "../utils/cache.js";
 
 
 // Get daily summary for user
 export const getDailySummary = async (req, res) => {
   try {
     const userId = req.user.id;
-
     const { date } = req.query;
+    const cacheKey = `history:daily:${userId}:${date || 'today'}`;
+
+    const cachedData = getCache(cacheKey);
+    if (cachedData) {
+      return res.json({ status: "success", message: "from cache", ...cachedData });
+    }
+
     const targetDate = new Date(date);
     const startOfDay = new Date(targetDate.setHours(0, 0, 0, 0));
     const endOfDay = new Date(targetDate.setHours(23, 59, 59, 999));
@@ -44,8 +51,7 @@ export const getDailySummary = async (req, res) => {
     const totalWater = waterLogs.reduce((sum, log) => sum + log.amount, 0);
     const netCalories = totalCaloriesIn - totalCaloriesOut;
 
-    res.json({
-      status: "success",
+    const response = {
       summary: {
         totalCaloriesIn,
         totalProtein,
@@ -61,6 +67,13 @@ export const getDailySummary = async (req, res) => {
         activities: activityLogs,
         water: waterLogs,
       },
+    };
+
+    setCache(cacheKey, response);
+
+    res.json({
+      status: "success",
+      ...response
     });
   } catch (error) {
     res.status(500).json({ status: "error", message: error.message });
@@ -71,6 +84,12 @@ export const getDailySummary = async (req, res) => {
 export const getWeeklyTrend = async (req, res) => {
   try {
     const userId = req.user.id;
+    const cacheKey = `history:weekly:${userId}`;
+
+    const cachedData = getCache(cacheKey);
+    if (cachedData) {
+      return res.json({ status: "success", message: "from cache", ...cachedData });
+    }
 
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
@@ -102,8 +121,7 @@ export const getWeeklyTrend = async (req, res) => {
     const totalCaloriesOut = activityLogs.reduce((sum, log) => sum + log.caloriesBurned, 0);
     const totalWater = waterLogs.reduce((sum, log) => sum + log.amount, 0);
 
-    res.json({
-      status: "success",
+    const response = {
       weeklySummary: {
         totalCaloriesIn,
         totalProtein,
@@ -121,6 +139,13 @@ export const getWeeklyTrend = async (req, res) => {
         weightLogs,
         waterLogs,
       },
+    };
+
+    setCache(cacheKey, response);
+
+    res.json({
+      status: "success",
+      ...response
     });
   } catch (error) {
     res.status(500).json({ status: "error", message: error.message });
@@ -131,6 +156,13 @@ export const getWeeklyTrend = async (req, res) => {
 export const getMonthlyTrend = async (req, res) => {
   try {
     const userId = req.user.id;
+    const cacheKey = `history:monthly:${userId}`;
+
+    const cachedData = getCache(cacheKey);
+    if (cachedData) {
+      return res.json({ status: "success", message: "from cache", ...cachedData });
+    }
+
     const thirtyDaysAgo = new Date();
     thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
 
@@ -143,8 +175,7 @@ export const getMonthlyTrend = async (req, res) => {
     const totalCaloriesOut = activityLogs.reduce((sum, log) => sum + log.caloriesBurned, 0);
     const totalWater = waterLogs.reduce((sum, log) => sum + log.amount, 0);
 
-    res.json({
-      status: "success",
+    const response = {
       monthlySummary: {
         totalCaloriesIn,
         totalCaloriesOut,
@@ -154,6 +185,13 @@ export const getMonthlyTrend = async (req, res) => {
         endWeight: weightLogs[weightLogs.length - 1]?.weight || null,
       },
       logs: { foodLogs, activityLogs, weightLogs, waterLogs }
+    };
+
+    setCache(cacheKey, response);
+
+    res.json({
+      status: "success",
+      ...response
     });
   } catch (error) {
     res.status(500).json({ status: "error", message: error.message });
@@ -164,6 +202,13 @@ export const getMonthlyTrend = async (req, res) => {
 export const getYearlyTrend = async (req, res) => {
   try {
     const userId = req.user.id;
+    const cacheKey = `history:yearly:${userId}`;
+
+    const cachedData = getCache(cacheKey);
+    if (cachedData) {
+      return res.json({ status: "success", message: "from cache", ...cachedData });
+    }
+
     const oneYearAgo = new Date();
     oneYearAgo.setDate(oneYearAgo.getDate() - 365);
 
@@ -176,8 +221,7 @@ export const getYearlyTrend = async (req, res) => {
     const totalCaloriesOut = activityLogs.reduce((sum, log) => sum + log.caloriesBurned, 0);
     const totalWater = waterLogs.reduce((sum, log) => sum + log.amount, 0);
 
-    res.json({
-      status: "success",
+    const response = {
       yearlySummary: {
         totalCaloriesIn,
         totalCaloriesOut,
@@ -187,6 +231,13 @@ export const getYearlyTrend = async (req, res) => {
         endWeight: weightLogs[weightLogs.length - 1]?.weight || null,
       },
       logs: { foodLogs, activityLogs, weightLogs, waterLogs }
+    };
+
+    setCache(cacheKey, response);
+
+    res.json({
+      status: "success",
+      ...response
     });
   } catch (error) {
     res.status(500).json({ status: "error", message: error.message });
