@@ -1,45 +1,23 @@
-/* 
- * ARCHITECTURE ROLE: Global Style Definitions
- * File ini berisi reset CSS global, utilitas kustom, dan token desain "Premium" Sirka.
- */
-
 @import "tailwindcss";
 
-/* ==========================================
- * 1. GLOBAL RESET & BASE STYLES
- * ========================================== */
 html,
 body {
   min-height: 100vh;
-  @apply bg-slate-50 text-slate-900; /* Default background & text */
+  @apply bg-slate-50 text-slate-900;
 }
 
-/* ==========================================
- * 2. PREMIUM DESIGN SYSTEM (Custom Utilities)
- * Digunakan untuk memberikan kesan mewah & modern pada UI.
- * ========================================== */
-
-/* Gradient khas Sirka untuk elemen highlight */
 .premium-gradient {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
 }
 
-/* Shadow lembut untuk efek layering ('Elevation') */
 .premium-shadow {
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.05), 0 10px 10px -5px rgba(0, 0, 0, 0.02);
 }
 
-/* Glassmorphism Effect */
 .glass {
   @apply bg-white/70 backdrop-blur-lg border border-white/20;
 }
 
-/* ==========================================
- * 3. COMPONENT STYLES
- * Overrides atau abstraksi komponen UI.
- * ========================================== */
-
-/* Tombol utama dengan efek gradient & hover premium */
 .btn-primary {
   background: linear-gradient(135deg, #10b981 0%, #059669 100%);
   @apply text-white font-bold rounded-2xl transition-all active:scale-95 shadow-lg shadow-emerald-200;
@@ -48,4 +26,3 @@ body {
 .input-premium {
   @apply w-full px-5 py-4 bg-white border border-slate-200 rounded-2xl focus:ring-2 focus:ring-emerald-500 focus:border-transparent outline-none transition-all;
 }
-
