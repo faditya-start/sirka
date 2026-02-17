@@ -14,6 +14,7 @@ import programRoutes from "./routes/programRoutes.js";
 import weightProgressRoutes from "./routes/weightProgressRoutes.js";
 import historyRoutes from "./routes/historyRoutes.js";
 import waterLogRoutes from "./routes/waterLogRoutes.js";
+import foodPresetRoutes from "./routes/foodPresetRoutes.js";
 
 // Load Environment Variables
 dotenv.config();
@@ -35,6 +36,7 @@ app.use("/api/programs", programRoutes);
 app.use("/api/weightprogress", weightProgressRoutes);
 app.use("/api/history", historyRoutes);
 app.use("/api/waterlogs", waterLogRoutes);
+app.use("/api/foodpresets", foodPresetRoutes);
 
 // Root Endpoint for Health Check
 app.get("/", (req, res) => {

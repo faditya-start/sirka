@@ -16,6 +16,16 @@ interface FoodEntry {
     date: string;
 }
 
+interface FoodPreset {
+    _id: string;
+    foodName: string;
+    calories: number;
+    protein: number;
+    carbs: number;
+    fat: number;
+    portion: string;
+}
+
 /**
  * ARCHITECTURE ROLE: FoodLog Page
  * Halaman utama untuk mencatat dan melihat riwayat makanan harian.
@@ -29,6 +39,11 @@ export default function FoodLog() {
     const [showAddModal, setShowAddModal] = useState(false);
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [selectedLogId, setSelectedLogId] = useState<string | null>(null);
+
+    // Preset State
+    const [presets, setPresets] = useState<FoodPreset[]>([]);
+    const [activeTab, setActiveTab] = useState<'form' | 'presets'>('form');
+    const [saveAsPreset, setSaveAsPreset] = useState(false);
 
     // Form State
     const [formData, setFormData] = useState({
@@ -48,6 +63,22 @@ export default function FoodLog() {
         }
         fetchLogs();
     }, [isAuthenticated, navigate]);
+
+    // Fetch presets when modal opens or tab changes to presets
+    useEffect(() => {
+        if (showAddModal && activeTab === 'presets') {
+            fetchPresets();
+        }
+    }, [showAddModal, activeTab]);
+
+    const fetchPresets = async () => {
+        try {
+            const response = await api.get("/foodpresets");
+            setPresets(response.data.data);
+        } catch (err) {
+            console.error("Gagal mengambil preset:", err);
+        }
+    };
 
     const fetchLogs = async () => {
         try {
@@ -79,7 +110,21 @@ export default function FoodLog() {
                 fat: parseFloat(formData.fat || "0"),
             });
             setLogs([response.data.data, ...logs]);
+
+            if (saveAsPreset) {
+                await api.post("/foodpresets", {
+                    foodName: formData.foodName,
+                    calories: parseFloat(formData.calories),
+                    protein: parseFloat(formData.protein || "0"),
+                    carbs: parseFloat(formData.carbs || "0"),
+                    fat: parseFloat(formData.fat || "0"),
+                    portion: formData.portion
+                });
+                // Refresh presets silently if needed or next time
+            }
+
             setShowAddModal(false);
+            setSaveAsPreset(false); // Reset checkbox
             setFormData({
                 foodName: "",
                 calories: "",
@@ -108,6 +153,30 @@ export default function FoodLog() {
             setSelectedLogId(null);
         } catch (err) {
             console.error("Gagal menghapus log:", err);
+        }
+    };
+
+    const handleLoadPreset = (preset: FoodPreset) => {
+        setFormData({
+            foodName: preset.foodName,
+            calories: preset.calories.toString(),
+            protein: preset.protein.toString(),
+            carbs: preset.carbs.toString(),
+            fat: preset.fat.toString(),
+            mealTime: formData.mealTime, // Keep current meal time selection
+            portion: preset.portion,
+        });
+        setActiveTab('form');
+    };
+
+    const handleDeletePreset = async (id: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (!confirm("Hapus preset ini dari favorit?")) return;
+        try {
+            await api.delete(`/foodpresets/${id}`);
+            setPresets(presets.filter(p => p._id !== id));
+        } catch (err) {
+            console.error("Gagal menghapus preset:", err);
         }
     };
 
@@ -208,108 +277,174 @@ export default function FoodLog() {
                 onClose={() => setShowAddModal(false)}
                 title="Tambah Makanan"
             >
-                <form onSubmit={handleAddFood} className="space-y-4">
-                    <div>
-                        <label className="block text-sm font-medium text-slate-700 mb-1">Nama Makanan</label>
-                        <input
-                            type="text"
-                            className="input-premium"
-                            placeholder="Misal: Nasi Goreng"
-                            value={formData.foodName}
-                            onChange={e => setFormData({ ...formData, foodName: e.target.value })}
-                            required
-                        />
+                <div className="space-y-6">
+                    {/* Tab Switcher */}
+                    <div className="flex p-1 bg-slate-100 rounded-xl mb-6">
+                        <button
+                            onClick={() => setActiveTab('form')}
+                            className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${activeTab === 'form' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                        >
+                            Input Baru
+                        </button>
+                        <button
+                            onClick={() => setActiveTab('presets')}
+                            className={`flex-1 py-2 text-sm font-bold rounded-lg transition-all ${activeTab === 'presets' ? 'bg-white text-emerald-600 shadow-sm' : 'text-slate-500 hover:text-slate-700'}`}
+                        >
+                            Favorit
+                        </button>
                     </div>
 
-                    <div className="grid grid-cols-2 gap-4">
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Kalori (kcal)</label>
-                            <input
-                                type="number"
-                                className="input-premium"
-                                placeholder="250"
-                                value={formData.calories}
-                                onChange={e => setFormData({ ...formData, calories: e.target.value })}
-                                required
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-sm font-medium text-slate-700 mb-1">Waktu Makan</label>
-                            <select
-                                className="input-premium appearance-none"
-                                value={formData.mealTime}
-                                onChange={e => setFormData({ ...formData, mealTime: e.target.value as any })}
-                            >
-                                {meals.map(m => <option key={m} value={m}>{m}</option>)}
-                            </select>
-                        </div>
-                    </div>
+                    {activeTab === 'form' ? (
+                        <form onSubmit={handleAddFood} className="space-y-4">
+                            <div>
+                                <label className="block text-sm font-medium text-slate-700 mb-1">Nama Makanan</label>
+                                <input
+                                    type="text"
+                                    className="input-premium"
+                                    placeholder="Misal: Nasi Goreng"
+                                    value={formData.foodName}
+                                    onChange={e => setFormData({ ...formData, foodName: e.target.value })}
+                                    required
+                                />
+                            </div>
 
-                    <div className="grid grid-cols-3 gap-3">
-                        <div>
-                            <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Protein (g)</label>
-                            <input
-                                type="number"
-                                className="input-premium py-2 text-sm"
-                                placeholder="0"
-                                value={formData.protein}
-                                onChange={e => setFormData({ ...formData, protein: e.target.value })}
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Karbo (g)</label>
-                            <input
-                                type="number"
-                                className="input-premium py-2 text-sm"
-                                placeholder="0"
-                                value={formData.carbs}
-                                onChange={e => setFormData({ ...formData, carbs: e.target.value })}
-                            />
-                        </div>
-                        <div>
-                            <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Lemak (g)</label>
-                            <input
-                                type="number"
-                                className="input-premium py-2 text-sm"
-                                placeholder="0"
-                                value={formData.fat}
-                                onChange={e => setFormData({ ...formData, fat: e.target.value })}
-                            />
-                        </div>
-                    </div>
+                            <div className="grid grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Kalori (kcal)</label>
+                                    <input
+                                        type="number"
+                                        className="input-premium"
+                                        placeholder="250"
+                                        value={formData.calories}
+                                        onChange={e => setFormData({ ...formData, calories: e.target.value })}
+                                        required
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-medium text-slate-700 mb-1">Waktu Makan</label>
+                                    <select
+                                        className="input-premium appearance-none"
+                                        value={formData.mealTime}
+                                        onChange={e => setFormData({ ...formData, mealTime: e.target.value as any })}
+                                    >
+                                        {meals.map(m => <option key={m} value={m}>{m}</option>)}
+                                    </select>
+                                </div>
+                            </div>
 
-                    <button type="submit" className="btn-primary w-full py-4 mt-4">Simpan Catatan</button>
-                </form>
+                            <div className="grid grid-cols-3 gap-3">
+                                <div>
+                                    <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Protein (g)</label>
+                                    <input
+                                        type="number"
+                                        className="input-premium py-2 text-sm"
+                                        placeholder="0"
+                                        value={formData.protein}
+                                        onChange={e => setFormData({ ...formData, protein: e.target.value })}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Karbo (g)</label>
+                                    <input
+                                        type="number"
+                                        className="input-premium py-2 text-sm"
+                                        placeholder="0"
+                                        value={formData.carbs}
+                                        onChange={e => setFormData({ ...formData, carbs: e.target.value })}
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-xs font-semibold text-slate-500 mb-1 uppercase">Lemak (g)</label>
+                                    <input
+                                        type="number"
+                                        className="input-premium py-2 text-sm"
+                                        placeholder="0"
+                                        value={formData.fat}
+                                        onChange={e => setFormData({ ...formData, fat: e.target.value })}
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="flex items-center gap-2 pt-2">
+                                <input
+                                    type="checkbox"
+                                    id="saveAsPreset"
+                                    checked={saveAsPreset}
+                                    onChange={(e) => setSaveAsPreset(e.target.checked)}
+                                    className="w-5 h-5 text-emerald-600 rounded-md border-gray-300 focus:ring-emerald-500"
+                                />
+                                <label htmlFor="saveAsPreset" className="text-sm text-slate-600 font-medium">Simpan ke Favorit</label>
+                            </div>
+
+                            <button type="submit" className="btn-primary w-full py-4 mt-4">Simpan Catatan</button>
+                        </form>
+                    ) : (
+                        <div className="space-y-3 max-h-[60vh] overflow-y-auto">
+                            {presets.length > 0 ? (
+                                presets.map((preset) => (
+                                    <div
+                                        key={preset._id}
+                                        onClick={() => handleLoadPreset(preset)}
+                                        className="p-4 rounded-2xl bg-slate-50 border border-slate-100 hover:border-emerald-200 hover:bg-emerald-50/30 transition-all cursor-pointer group flex items-center justify-between"
+                                    >
+                                        <div>
+                                            <h4 className="font-bold text-slate-800">{preset.foodName}</h4>
+                                            <div className="flex gap-2 text-xs text-slate-500 mt-1">
+                                                <span>{preset.calories} kcal</span>
+                                                <span>•</span>
+                                                <span>{preset.portion}</span>
+                                            </div>
+                                        </div>
+                                        <button
+                                            onClick={(e) => handleDeletePreset(preset._id, e)}
+                                            className="w-8 h-8 rounded-full bg-white text-slate-300 hover:text-red-500 hover:bg-red-50 flex items-center justify-center transition-all opacity-0 group-hover:opacity-100"
+                                        >
+                                            <i className="lni lni-trash-can"></i>
+                                        </button>
+                                    </div>
+                                ))
+                            ) : (
+                                <div className="text-center py-10 text-slate-400">
+                                    <i className="lni lni-star text-4xl mb-3 block opacity-20"></i>
+                                    <p className="text-sm">Belum ada makanan favorit.</p>
+                                    <p className="text-xs mt-1">Simpan makanan yang sering Anda makan saat mencatat untuk akses cepat.</p>
+                                </div>
+                            )}
+                        </div>
+                    )}
+                </div>
             </BottomModal>
 
             {/* Confirmation Delete Modal - Keeping original for simplified boolean state flow, or could refactor to BottomModal too if desired, but centered alert is usually better for confirmation */}
-            {showDeleteModal && (
-                <div className="fixed inset-0 z-[110] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-6">
-                    <div className="bg-white w-full max-w-sm rounded-3xl p-8 space-y-6 text-center premium-shadow">
-                        <div className="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center text-4xl mx-auto">
-                            <i className="lni lni-warning"></i>
-                        </div>
-                        <div>
-                            <h2 className="text-2xl font-bold text-slate-900">Hapus Catatan?</h2>
-                            <p className="text-slate-500 mt-2">Data yang sudah dihapus tidak dapat dikembalikan lagi.</p>
-                        </div>
-                        <div className="flex flex-col gap-3 pt-2">
-                            <button
-                                onClick={confirmDelete}
-                                className="w-full py-4 bg-red-500 hover:bg-red-600 text-white font-bold rounded-2xl transition-all active:scale-95"
-                            >
-                                Ya, Hapus Sekarang
-                            </button>
-                            <button
-                                onClick={() => setShowDeleteModal(false)}
-                                className="w-full py-4 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-2xl transition-all"
-                            >
-                                Batalkan
-                            </button>
+            {
+                showDeleteModal && (
+                    <div className="fixed inset-0 z-[110] bg-slate-900/40 backdrop-blur-sm flex items-center justify-center p-6">
+                        <div className="bg-white w-full max-w-sm rounded-3xl p-8 space-y-6 text-center premium-shadow">
+                            <div className="w-20 h-20 bg-red-50 text-red-500 rounded-full flex items-center justify-center text-4xl mx-auto">
+                                <i className="lni lni-warning"></i>
+                            </div>
+                            <div>
+                                <h2 className="text-2xl font-bold text-slate-900">Hapus Catatan?</h2>
+                                <p className="text-slate-500 mt-2">Data yang sudah dihapus tidak dapat dikembalikan lagi.</p>
+                            </div>
+                            <div className="flex flex-col gap-3 pt-2">
+                                <button
+                                    onClick={confirmDelete}
+                                    className="w-full py-4 bg-red-500 hover:bg-red-600 text-white font-bold rounded-2xl transition-all active:scale-95"
+                                >
+                                    Ya, Hapus Sekarang
+                                </button>
+                                <button
+                                    onClick={() => setShowDeleteModal(false)}
+                                    className="w-full py-4 bg-slate-100 hover:bg-slate-200 text-slate-600 font-bold rounded-2xl transition-all"
+                                >
+                                    Batalkan
+                                </button>
+                            </div>
                         </div>
                     </div>
-                </div>
-            )}
-        </div>
+                )
+            }
+        </div >
     );
 }
