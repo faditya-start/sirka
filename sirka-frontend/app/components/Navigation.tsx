@@ -14,6 +14,7 @@ export default function Navigation() {
         { label: "Makan", path: "/food-log", icon: "lni-knife-fork-1" },
         { label: "Olahraga", path: "/exercise", icon: "lni-dumbbell-1" },
         { label: "Tidur", path: "/sleep", icon: "lni-timer" },
+        { label: "Mood", path: "/mood", icon: "lni-emoji-smile" },
         { label: "Laporan", path: "/history", icon: "lni-bar-chart-4" },
         { label: "Profil", path: "/profile", icon: "lni-user-4" },
     ];
