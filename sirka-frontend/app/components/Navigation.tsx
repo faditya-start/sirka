@@ -13,6 +13,7 @@ export default function Navigation() {
         { label: "Beranda", path: "/", icon: "lni-home-2" },
         { label: "Makan", path: "/food-log", icon: "lni-knife-fork-1" },
         { label: "Olahraga", path: "/exercise", icon: "lni-dumbbell-1" },
+        { label: "Tidur", path: "/sleep", icon: "lni-empty-file" }, // Changed to a better icon if possible, but lni-empty-file is a placeholder for now. Actually let's use lni-alarm-clock or similar if available.
         { label: "Laporan", path: "/history", icon: "lni-bar-chart-4" },
         { label: "Profil", path: "/profile", icon: "lni-user-4" },
     ];
