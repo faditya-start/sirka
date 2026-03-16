@@ -16,6 +16,7 @@ export default function Home() {
   const [todayCalories, setTodayCalories] = useState(0);
   const [burnedCalories, setBurnedCalories] = useState(0);
   const [todayWater, setTodayWater] = useState(0);
+  const [todaySleep, setTodaySleep] = useState(0);
 
   // Calculate goal based on user data or default to 2000
   // For maintain weight, simple BMR approximation: Weight * 24 * 1.2
@@ -63,6 +64,14 @@ export default function Home() {
         new Date(log.date).toLocaleDateString('en-CA') === todayShort
       );
       setBurnedCalories(todaysActivity.reduce((sum, log) => sum + (log.caloriesBurned || 0), 0));
+
+      // 4. Fetch Sleep Logs & Filter for Today
+      const sleepResponse = await api.get("/sleeplogs");
+      const sleepLogs: any[] = sleepResponse.data.data || [];
+      const todaysSleep = sleepLogs.filter((log: any) =>
+        new Date(log.date).toLocaleDateString('en-CA') === todayShort
+      );
+      setTodaySleep(todaysSleep.reduce((sum, log) => sum + (log.duration || 0), 0));
 
     } catch (err) {
       console.error("Failed to fetch dashboard data", err);
@@ -164,7 +173,7 @@ export default function Home() {
                   <span className="text-sm font-medium text-slate-600">Makan</span>
                 </Link>
 
-                {['Olahraga', 'Berat', 'Profil'].map((item) => (
+                {['Olahraga', 'Tidur', 'Berat', 'Profil'].map((item) => (
                   item === 'Berat' ? (
                     <Link key={item} to="/weight-progress" className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-slate-50 hover:bg-white hover:shadow-md border border-transparent hover:border-slate-100 transition-all group">
                       <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center text-xl group-hover:scale-110 transition-transform text-emerald-600">
@@ -176,6 +185,13 @@ export default function Home() {
                     <Link key={item} to="/profile" className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-slate-50 hover:bg-white hover:shadow-md border border-transparent hover:border-slate-100 transition-all group">
                       <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center text-xl group-hover:scale-110 transition-transform text-emerald-600">
                         <i className="lni lni-user-4"></i>
+                      </div>
+                      <span className="text-sm font-medium text-slate-600">{item}</span>
+                    </Link>
+                  ) : item === 'Tidur' ? (
+                    <Link key={item} to="/sleep" className="flex flex-col items-center gap-2 p-4 rounded-2xl bg-slate-50 hover:bg-white hover:shadow-md border border-transparent hover:border-slate-100 transition-all group">
+                      <div className="w-12 h-12 rounded-xl bg-white shadow-sm flex items-center justify-center text-xl group-hover:scale-110 transition-transform text-emerald-600">
+                        <i className="lni lni-timer"></i>
                       </div>
                       <span className="text-sm font-medium text-slate-600">{item}</span>
                     </Link>
