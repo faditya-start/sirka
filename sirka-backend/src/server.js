@@ -17,6 +17,7 @@ import waterLogRoutes from "./routes/waterLogRoutes.js";
 import foodPresetRoutes from "./routes/foodPresetRoutes.js";
 import sleepLogRoutes from "./routes/sleepLogRoutes.js";
 import moodLogRoutes from "./routes/moodLogRoutes.js";
+import gamificationRoutes from "./routes/gamificationRoutes.js";
 
 // Load Environment Variables
 dotenv.config();
@@ -41,6 +42,7 @@ app.use("/api/waterlogs", waterLogRoutes);
 app.use("/api/foodpresets", foodPresetRoutes);
 app.use("/api/sleeplogs", sleepLogRoutes);
 app.use("/api/moodlogs", moodLogRoutes);
+app.use("/api/gamification", gamificationRoutes);
 
 // Root Endpoint for Health Check
 app.get("/", (req, res) => {
