@@ -1,6 +1,7 @@
 import ActivityLog from "../models/ActivityLog.js";
 import User from "../models/User.js";
 import { getCache, setCache, clearCachePattern } from "../utils/cache.js";
+import { awardPoints } from "../utils/gamificationUtils.js";
 
 export const createActivityLog = async (req, res) => {
   try {
@@ -29,10 +30,14 @@ export const createActivityLog = async (req, res) => {
     clearCachePattern(`history:monthly:${userId}`);
     clearCachePattern(`history:yearly:${userId}`);
 
+    // Award Gamification Points
+    const gamification = await awardPoints(userId, 'LOG_ACTIVITY');
+
     res.status(201).json({
       status: "success",
       message: "Aktivitas berhasil dicatat",
       data: log,
+      gamification
     });
   } catch (error) {
     res.status(500).json({ status: "error", message: error.message });

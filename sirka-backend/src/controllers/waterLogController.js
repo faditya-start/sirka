@@ -1,6 +1,7 @@
 import WaterLog from "../models/WaterLog.js";
 import User from "../models/User.js";
 import { getCache, setCache, clearCachePattern } from "../utils/cache.js";
+import { awardPoints } from "../utils/gamificationUtils.js";
 
 export const createWaterLog = async (req, res) => {
     try {
@@ -25,10 +26,14 @@ export const createWaterLog = async (req, res) => {
         clearCachePattern(`history:monthly:${userId}`);
         clearCachePattern(`history:yearly:${userId}`);
 
+        // Award Gamification Points
+        const gamification = await awardPoints(userId, 'LOG_WATER');
+
         res.status(201).json({
             status: "success",
             message: "Log air berhasil dibuat",
             data: log,
+            gamification
         });
     } catch (error) {
         res.status(500).json({ status: "error", message: error.message });

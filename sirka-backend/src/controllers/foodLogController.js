@@ -5,6 +5,7 @@
 import FoodLog from "../models/FoodLog.js";
 import User from "../models/User.js";
 import { getCache, setCache, clearCachePattern } from "../utils/cache.js";
+import { awardPoints } from "../utils/gamificationUtils.js";
 
 /**
  * Membuat catatan makanan baru
@@ -38,10 +39,14 @@ export const createFoodLog = async (req, res) => {
     clearCachePattern(`history:monthly:${userId}`);
     clearCachePattern(`history:yearly:${userId}`);
 
+    // Award Gamification Points
+    const gamification = await awardPoints(userId, 'LOG_FOOD');
+
     res.status(201).json({
       status: "success",
       message: "Log makanan berhasil dibuat",
       data: log,
+      gamification // Sertakan info gamifikasi untuk pop-up/notifikasi
     });
   } catch (error) {
     res.status(500).json({ status: "error", message: error.message });

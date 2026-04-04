@@ -20,6 +20,13 @@ const userSchema = new mongoose.Schema(
       default: 1.2, // Sedentary (little or no exercise)
       required: false
     },
+    // Gamification fields
+    points: { type: Number, default: 0 },
+    level: { type: Number, default: 1 },
+    lastActiveDate: { type: Date, default: null },
+    currentStreak: { type: Number, default: 0 },
+    highestStreak: { type: Number, default: 0 },
+    badges: [{ type: String }],
   },
   { timestamps: true }
 );

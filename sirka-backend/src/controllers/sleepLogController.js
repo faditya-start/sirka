@@ -1,6 +1,7 @@
 import SleepLog from "../models/SleepLog.js";
 import User from "../models/User.js";
 import { getCache, setCache, clearCachePattern } from "../utils/cache.js";
+import { awardPoints } from "../utils/gamificationUtils.js";
 
 export const createSleepLog = async (req, res) => {
   try {
@@ -25,10 +26,14 @@ export const createSleepLog = async (req, res) => {
     clearCachePattern(`history:daily:${userId}`);
     clearCachePattern(`history:weekly:${userId}`);
 
+    // Award Gamification Points
+    const gamification = await awardPoints(userId, 'LOG_SLEEP');
+
     res.status(201).json({
       status: "success",
       message: "Data tidur berhasil dicatat",
       data: log,
+      gamification
     });
   } catch (error) {
     res.status(500).json({ status: "error", message: error.message });
