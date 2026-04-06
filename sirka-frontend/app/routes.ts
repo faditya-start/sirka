@@ -13,4 +13,5 @@ export default [
     route("mood", "routes/mood.tsx"),
     route("history", "routes/history-summary.tsx"),
     route("gamification", "routes/gamification.tsx"),
+    
 ] satisfies RouteConfig;
